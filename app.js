@@ -91,19 +91,129 @@ const frenchWords = [
   ["Числа", "Dix", "дис", "Десять"],
 ].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
 
+const russianGrammar = [
+  {
+    title: "Pas d'article",
+    rule: "Le russe ne dit pas « le », « la » ou « un ». Le mot seul suffit.",
+    examples: [
+      { say: "вода", target: "Вода", gloss: "de l'eau, l'eau" },
+      { say: "хлеб", target: "Хлеб", gloss: "du pain, le pain" },
+    ],
+  },
+  {
+    title: "Tu et vous",
+    rule: "Ты parle à un proche. Вы parle à plusieurs personnes, ou marque le respect.",
+    examples: [
+      { say: "привет", target: "Привет", gloss: "salut, avec ты" },
+      { say: "здравствуйте", target: "Здравствуйте", gloss: "bonjour, avec вы" },
+    ],
+  },
+  {
+    title: "La négation",
+    rule: "Не se place devant le mot qu'il nie.",
+    examples: [
+      { say: "я не знаю", target: "Я не знаю", gloss: "je ne sais pas" },
+      { say: "это не вода", target: "Это не вода", gloss: "ce n'est pas de l'eau" },
+    ],
+  },
+];
+
+const frenchGrammar = [
+  {
+    title: "Артикль",
+    rule: "Перед французским словом почти всегда стоит маленькое слово: le, la, un, une.",
+    examples: [
+      { say: "le pain", target: "Le pain", gloss: "хлеб" },
+      { say: "une pomme", target: "Une pomme", gloss: "яблоко" },
+    ],
+  },
+  {
+    title: "Глагол être",
+    rule: "По-французски «быть» не пропадает. Je suis значит «я есть».",
+    examples: [
+      { say: "je suis", target: "Je suis", gloss: "я" },
+      { say: "c'est de l'eau", target: "C'est de l'eau", gloss: "это вода" },
+    ],
+  },
+  {
+    title: "Отрицание",
+    rule: "Отрицание обнимает глагол: ne ... pas.",
+    examples: [
+      { say: "je ne sais pas", target: "Je ne sais pas", gloss: "я не знаю" },
+      { say: "ce n'est pas du pain", target: "Ce n'est pas du pain", gloss: "это не хлеб" },
+    ],
+  },
+];
+
+const bretonAlphabet = [
+  { upper: "C'H", lower: "c'h", name: "C'h", hint: "Un souffle au fond de la gorge, comme le j espagnol.", example: "c'hoant", exampleBack: "envie", speak: "c'hoant" },
+  { upper: "ZH", lower: "zh", name: "Zh", hint: "Souvent comme un z léger, parfois comme un ch.", example: "brezhoneg", exampleBack: "le breton", speak: "brezhoneg" },
+  { upper: "Ñ", lower: "ñ", name: "N tilde", hint: "Il nasalise le son d'avant.", example: "emañ", exampleBack: "est (quelque part)", speak: "emañ" },
+  { upper: "LH", lower: "lh", name: "Lh", hint: "Un l mouillé, proche du « ili ».", example: "familh", exampleBack: "famille", speak: "familh" },
+  { upper: "EU", lower: "eu", name: "Eu", hint: "Entre « é » et « eu » français.", example: "breur", exampleBack: "frère", speak: "breur" },
+  { upper: "OU", lower: "ou", name: "Ou", hint: "Comme le ou de « loup ».", example: "dour", exampleBack: "eau", speak: "dour" },
+];
+
+const bretonWords = [
+  ["Salutations", "Demat", "dématt", "Bonjour"],
+  ["Salutations", "Kenavo", "kénavo", "Au revoir"],
+  ["Salutations", "Nozvezh vat", "nozvèss vatt", "Bonne nuit"],
+  ["Salutations", "Mont a ra ?", "monn a ra", "Comment ça va ?"],
+  ["Mots utiles", "Trugarez", "trugarèz", "Merci"],
+  ["Mots utiles", "Mar plij", "mar pli", "S'il vous plaît"],
+  ["Mots utiles", "Ya", "ya", "Oui"],
+  ["Mots utiles", "Nann", "nann", "Non"],
+  ["Mots utiles", "Digarezit", "digarèzitt", "Excusez-moi"],
+  ["Mots utiles", "Brezhoneg", "brézoneg", "Le breton"],
+  ["Nourriture", "Dour", "dour", "Eau"],
+  ["Nourriture", "Bara", "bara", "Pain"],
+  ["Nourriture", "Laezh", "laèz", "Lait"],
+  ["Nourriture", "Aval", "aval", "Pomme"],
+  ["Nourriture", "Te", "té", "Thé"],
+  ["Nourriture", "Kafe", "kafé", "Café"],
+  ["Chiffres", "Unan", "ünan", "Un"],
+  ["Chiffres", "Daou", "daou", "Deux"],
+  ["Chiffres", "Tri", "tri", "Trois"],
+  ["Chiffres", "Dek", "dek", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const bretonGrammar = [
+  {
+    title: "L'article ar, al, an",
+    rule: "Le défini change selon le mot qui suit : ar bara, al laezh, an aval.",
+    examples: [
+      { say: "ar bara", target: "Ar bara", gloss: "le pain" },
+      { say: "an aval", target: "An aval", gloss: "la pomme" },
+    ],
+  },
+  {
+    title: "Un, une : ur, ul, un",
+    rule: "L'indéfini suit la même idée : ur bara, ul laezh, un aval.",
+    examples: [
+      { say: "ur bara", target: "Ur bara", gloss: "un pain" },
+      { say: "un aval", target: "Un aval", gloss: "une pomme" },
+    ],
+  },
+  {
+    title: "Ya et nann",
+    rule: "Ya veut dire oui. Nann veut dire non. Ils se placent en tête.",
+    examples: [
+      { say: "ya, trugarez", target: "Ya, trugarez", gloss: "oui, merci" },
+      { say: "nann, trugarez", target: "Nann, trugarez", gloss: "non, merci" },
+    ],
+  },
+];
+
 const courses = {
   "fr-ru": {
     id: "fr-ru",
     ui: "fr",
     voice: "ru-RU",
-    teacher: "Nina Sokolova",
-    role: "Professeure de russe",
-    portrait: "nina.jpg",
-    crop: "",
     title: "Russe",
     forWhom: "Si vous parlez français",
     lines: {
-      lobby: "Je m’appelle Nina. Une lettre, puis les mots qui doivent revenir.",
+      lobby: "Une lettre, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "Écoutez la lettre, puis répétez-la tout bas.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
       speak: "Je le dis. Vous le reprenez.",
@@ -111,6 +221,11 @@ const courses = {
     },
     alphabet: russianAlphabet,
     words: russianWords,
+    grammar: russianGrammar,
+    teachers: [
+      { id: "nina", name: "Nina Sokolova", role: "Professeure de russe", portrait: "nina.jpg", hello: "Je m’appelle Nina. Une lettre, une règle, puis les mots qui reviennent." },
+      { id: "pavel", name: "Pavel Volkov", role: "Professeur de russe", portrait: "pavel.jpg", hello: "Je m’appelle Pavel. Une lettre, une règle, puis les mots qui reviennent." },
+    ],
     labels: {
       front: "Russe",
       back: "Français",
@@ -119,6 +234,8 @@ const courses = {
       listen: "Écouter",
       flip: "Retourner",
       nextLetter: "Lettre suivante",
+      toGrammar: "La grammaire",
+      grammarStep: "Grammaire",
       toWords: "Vers les mots",
       again: "À revoir",
       know: "Je le sais",
@@ -149,14 +266,11 @@ const courses = {
     id: "ru-fr",
     ui: "ru",
     voice: "fr-FR",
-    teacher: "Enora Le Gall",
-    role: "Преподаватель французского",
-    portrait: "enora.jpg",
-    crop: "left",
-    title: "Французский",
+    title: "Français",
     forWhom: "Если вы говорите по-русски",
     lines: {
-      lobby: "Меня зовут Энора. Одна буква, затем слова, которые нужно вернуть.",
+      lobby: "Одна буква, одно правило, затем слова, которые нужно вернуть.",
+      grammar: "Правило дня. Послушайте два примера.",
       alphabet: "Слушайте букву и повторите её тихо.",
       vocab: "Если слово ушло, нажмите «Повторить». Оно вернётся.",
       speak: "Я говорю. Вы повторяете.",
@@ -164,6 +278,11 @@ const courses = {
     },
     alphabet: frenchAlphabet,
     words: frenchWords,
+    grammar: frenchGrammar,
+    teachers: [
+      { id: "sophie", name: "Sophie Montaigne", role: "Professeure de français", portrait: "sophie.jpg", hello: "Меня зовут Софи Монтень. Одна буква, одно правило, затем слова." },
+      { id: "louis", name: "Louis Montaigne", role: "Professeur de français", portrait: "louis.jpg", hello: "Меня зовут Луи Монтень. Одна буква, одно правило, затем слова." },
+    ],
     labels: {
       front: "Французский",
       back: "Русский",
@@ -172,6 +291,8 @@ const courses = {
       listen: "Слушать",
       flip: "Перевернуть",
       nextLetter: "Следующая буква",
+      toGrammar: "Грамматика",
+      grammarStep: "Грамматика",
       toWords: "К словам",
       again: "Повторить",
       know: "Знаю",
@@ -203,6 +324,63 @@ const courses = {
       noVoice: "Голос здесь недоступен. Смотрите на запись произношения.",
     },
   },
+  "fr-br": {
+    id: "fr-br",
+    ui: "fr",
+    voice: "br",
+    title: "Breton",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Un son, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "Écoutez ce son, puis répétez-le tout bas.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: bretonAlphabet,
+    words: bretonWords,
+    grammar: bretonGrammar,
+    teachers: [
+      { id: "enora", name: "Enora Le Gall", role: "Professeure de breton", portrait: "enora.jpg", hello: "Je m’appelle Enora Le Gall. Un son du breton, une règle, puis des mots." },
+      { id: "yann", name: "Yann Le Gall", role: "Professeur de breton", portrait: "yann.jpg", hello: "Je m’appelle Yann Le Gall. Un son du breton, une règle, puis des mots." },
+    ],
+    labels: {
+      front: "Breton",
+      back: "Français",
+      start: "Commencer",
+      backHome: "Les langues",
+      listen: "Écouter",
+      flip: "Retourner",
+      nextLetter: "Son suivant",
+      toGrammar: "La grammaire",
+      grammarStep: "Grammaire",
+      toWords: "Vers les mots",
+      again: "À revoir",
+      know: "Je le sais",
+      toSpeak: "Vers la prononciation",
+      repeated: "J’ai répété",
+      finish: "Terminer",
+      doneHome: "Les langues",
+      review: "Révision",
+      fresh: "Nouveau",
+      session: "Séance du jour",
+      already: "Séance déjà faite aujourd’hui",
+      finished: "Séance terminée",
+      againTitle: "On peut recommencer",
+      ready: "Cinq minutes",
+      lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+      doneTitle: "À demain",
+      held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
+      streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
+      letterStep: (i, n) => `Son · ${i} sur ${n}`,
+      wordStep: (i, n) => `Mots · ${i} sur ${n}`,
+      speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
+      plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+      install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
+      noVoice: "La voix bretonne n’est pas toujours disponible. Suivez l’écriture.",
+    },
+  },
 };
 
 const soon = [
@@ -223,6 +401,7 @@ const roleEl = document.getElementById("role");
 const brandSub = document.getElementById("brand-sub");
 
 let course = null;
+let teacher = null;
 let screen = "pick";
 let cursor = 0;
 let session = null;
@@ -280,6 +459,7 @@ function buildSession(progress) {
     newIds,
     letterIndex,
     letterIsNew,
+    grammarIndex: Math.floor(Date.now() / 86400000) % course.grammar.length,
     speaks: wordIds.slice(0, 3),
   };
 }
@@ -333,11 +513,13 @@ function setActions(buttons) {
 }
 
 function showTeacher(line) {
+  document.querySelector(".app").classList.add("in-lesson");
+  document.getElementById("figure-wrap").hidden = false;
   coachEl.hidden = false;
-  portraitEl.src = course.portrait;
-  portraitEl.classList.toggle("left", course.crop === "left");
-  whoEl.textContent = course.teacher;
-  roleEl.textContent = course.role;
+  portraitEl.src = teacher.portrait;
+  portraitEl.alt = teacher.name;
+  whoEl.textContent = teacher.name;
+  roleEl.textContent = teacher.role;
   lineEl.textContent = line;
   brandSub.textContent = course.title;
   document.documentElement.lang = course.ui;
@@ -357,17 +539,28 @@ function openCourse() {
 
 function showPick() {
   course = null;
+  teacher = null;
   screen = "pick";
+  document.querySelector(".app").classList.remove("in-lesson");
+  document.getElementById("figure-wrap").hidden = true;
   coachEl.hidden = true;
   clockEl.hidden = true;
   stepEl.textContent = "";
   brandSub.textContent = "langue, en breton";
   document.documentElement.lang = "fr";
-  const cards = Object.values(courses).map((item) => `
-    <button class="course" type="button" data-course="${item.id}">
-      <img class="${item.crop}" src="${item.portrait}" alt="">
-      <span><strong>${item.teacher}</strong><span>${item.title} · ${item.forWhom}</span></span>
-    </button>
+  const blocks = Object.values(courses).map((item) => `
+    <article class="lang-block">
+      <h2>${item.title}</h2>
+      <p>${item.forWhom}</p>
+      <div class="pair">
+        ${item.teachers.map((person) => `
+          <button type="button" data-course="${item.id}" data-teacher="${person.id}">
+            <img src="${person.portrait}" alt="">
+            <strong>${person.name}</strong>
+          </button>
+        `).join("")}
+      </div>
+    </article>
   `).join("");
   const later = soon.map((item) => `
     <button class="course soon" type="button" disabled>
@@ -377,10 +570,10 @@ function showPick() {
   `).join("");
   stage.innerHTML = `
     <article class="panel">
-      <h2>Cinq minutes, dans les deux sens</h2>
-      <p>Un personnage vous guide. Le russe pour le français, le français pour le russe. Les mots reviennent les jours suivants.</p>
+      <h2>Choisissez qui vous guide</h2>
+      <p>Une fille ou un garçon, pour cinq minutes. Le russe, le français, le breton. Les mots reviennent les jours suivants.</p>
     </article>
-    <div class="courses">${cards}${later}</div>
+    <div class="courses">${blocks}${later}</div>
   `;
   setActions([]);
 }
@@ -391,7 +584,7 @@ function showLobby() {
   const plan = progress.savedDay === todayKey() && progress.savedSession ? progress.savedSession : buildSession(progress);
   const reviews = plan.wordIds.length - plan.newIds.length;
   const doneToday = progress.lastDone === todayKey();
-  showTeacher(course.lines.lobby);
+  showTeacher(teacher.hello);
   stepEl.textContent = doneToday ? course.labels.already : course.labels.session;
   clockEl.hidden = false;
   clockEl.textContent = "5 min";
@@ -426,7 +619,26 @@ function showAlphabet() {
   `;
   setActions([
     { label: course.labels.listen, action: "listen", primary: true },
-    { label: session.wordIds.length ? course.labels.toWords : course.labels.finish, action: "next" },
+    { label: course.labels.toGrammar, action: "next" },
+  ]);
+}
+
+function showGrammar() {
+  screen = "grammar";
+  const item = course.grammar[(session.grammarIndex || 0) % course.grammar.length];
+  showTeacher(course.lines.grammar);
+  stepEl.textContent = course.labels.grammarStep;
+  stage.innerHTML = `
+    <article class="panel">
+      <p class="mark">${item.title}</p>
+      <p class="rule">${item.rule}</p>
+      <div class="examples">
+        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong>${example.target}</strong><span>${example.gloss}</span></button>`).join("")}
+      </div>
+    </article>
+  `;
+  setActions([
+    { label: course.labels.toWords, action: "next", primary: true, wide: true },
   ]);
 }
 
@@ -539,6 +751,7 @@ function flipCard() {
 }
 
 function currentSpeakText() {
+  if (screen === "grammar") return course.grammar[(session.grammarIndex || 0) % course.grammar.length].examples[0].say;
   if (screen === "alphabet") return course.alphabet[session.letterIndex].speak;
   if (screen === "vocab") return course.words[session.wordIds[cursor]].speak;
   if (screen === "speak") return course.words[session.speaks[cursor]].speak;
@@ -566,6 +779,11 @@ const handlers = {
   next() {
     if (screen === "alphabet") {
       cursor = 0;
+      showGrammar();
+      return;
+    }
+    if (screen === "grammar") {
+      cursor = 0;
       if (session.wordIds.length) showVocab();
       else showDone();
       return;
@@ -586,9 +804,15 @@ actions.addEventListener("click", (event) => {
 });
 
 stage.addEventListener("click", (event) => {
-  const choice = event.target.closest("[data-course]");
+  const said = event.target.closest("[data-say]");
+  if (said) {
+    speak(said.dataset.say);
+    return;
+  }
+  const choice = event.target.closest("[data-teacher]");
   if (choice) {
     course = courses[choice.dataset.course];
+    teacher = course.teachers.find((person) => person.id === choice.dataset.teacher);
     showLobby();
     return;
   }
