@@ -281,7 +281,7 @@ const courses = {
     grammar: frenchGrammar,
     teachers: [
       { id: "sophie", name: "Sophie Montaigne", role: "Professeure de français", portrait: "sophie.jpg", hello: "Меня зовут Софи Монтень. Одна буква, одно правило, затем слова." },
-      { id: "louis", name: "Louis Montaigne", role: "Professeur de français", portrait: "louis.jpg", hello: "Меня зовут Луи Монтень. Одна буква, одно правило, затем слова." },
+      { id: "louis", name: "Louis Beaumont", role: "Professeur de français", portrait: "louis.jpg", hello: "Меня зовут Луи Бомон. Одна буква, одно правило, затем слова." },
     ],
     labels: {
       front: "Французский",
@@ -343,7 +343,7 @@ const courses = {
     grammar: bretonGrammar,
     teachers: [
       { id: "enora", name: "Enora Le Gall", role: "Professeure de breton", portrait: "enora.jpg", hello: "Je m’appelle Enora Le Gall. Un son du breton, une règle, puis des mots." },
-      { id: "yann", name: "Yann Le Gall", role: "Professeur de breton", portrait: "yann.jpg", hello: "Je m’appelle Yann Le Gall. Un son du breton, une règle, puis des mots." },
+      { id: "yann", name: "Yann Madec", role: "Professeur de breton", portrait: "yann.jpg", hello: "Je m’appelle Yann Madec. Un son du breton, une règle, puis des mots." },
     ],
     labels: {
       front: "Breton",
@@ -479,6 +479,11 @@ function speak(text) {
   speechSynthesis.speak(utterance);
 }
 
+function scriptAttrs() {
+  const dir = course.dir === "rtl" ? ' dir="rtl"' : "";
+  return `lang="${course.voice.slice(0, 2)}"${dir}`;
+}
+
 function formatClock(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -612,7 +617,7 @@ function showAlphabet() {
   stage.innerHTML = `
     <article class="panel">
       <p class="mark">${letter.name}</p>
-      <p class="letter" lang="${course.voice.slice(0, 2)}">${letter.upper} ${letter.lower}</p>
+      <p class="letter" ${scriptAttrs()}>${letter.upper} ${letter.lower}</p>
       <p class="hint">${letter.hint}</p>
       <p class="example">${letter.example} · ${letter.exampleBack}</p>
     </article>
@@ -633,7 +638,7 @@ function showGrammar() {
       <p class="mark">${item.title}</p>
       <p class="rule">${item.rule}</p>
       <div class="examples">
-        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong>${example.target}</strong><span>${example.gloss}</span></button>`).join("")}
+        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong ${scriptAttrs()}>${example.target}</strong><span>${example.gloss}</span></button>`).join("")}
       </div>
     </article>
   `;
@@ -654,7 +659,7 @@ function showVocab() {
       <span class="card-inner">
         <span class="face face-front">
           <span class="tag">${isNew ? course.labels.fresh : course.labels.review}</span>
-          <span class="word" lang="${course.voice.slice(0, 2)}">${word.front}</span>
+          <span class="word" ${scriptAttrs()}>${word.front}</span>
           <span class="phonetic">${word.phonetic}</span>
           <span class="face-label">${course.labels.front}</span>
         </span>
@@ -683,7 +688,7 @@ function showSpeak() {
   stage.innerHTML = `
     <article class="panel">
       <p class="mark">${word.back}</p>
-      <p class="word" lang="${course.voice.slice(0, 2)}">${word.front}</p>
+      <p class="word" ${scriptAttrs()}>${word.front}</p>
       <p class="phonetic">${word.phonetic}</p>
     </article>
   `;
