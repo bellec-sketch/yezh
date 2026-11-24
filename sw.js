@@ -1,9 +1,11 @@
-const CACHE = "yezh-v6";
+const CACHE = "yezh-v7";
 const FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./srsEngine.js",
+  "./tutorsData.js",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",

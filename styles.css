@@ -98,6 +98,24 @@ button, input { font: inherit; }
   font-size: 0.86rem;
 }
 
+.gauge {
+  height: 4px;
+  margin-top: 10px;
+  background: rgba(31, 75, 110, 0.12);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.gauge[hidden] { display: none; }
+
+.gauge > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--gold);
+  transition: width 0.25s ease;
+}
+
 .coach {
   display: grid;
   grid-template-columns: 76px 1fr;
@@ -502,6 +520,19 @@ button, input { font: inherit; }
   border-color: #a85b58;
   background: #fdeeee;
 }
+
+.choice.good {
+  border-color: #2f6b4f;
+  background: #e7f4ec;
+}
+
+.dialogue .who-line {
+  margin: 12px 0 2px;
+  font-weight: 750;
+  color: var(--blue-deep);
+}
+
+.dialogue .example-btn { margin-top: 8px; }
 
 .choices {
   display: flex;

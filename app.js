@@ -1,4 +1,5 @@
-const intervals = [1, 3, 7, 14, 30, 60];
+import { applyStreak, buildDaySession, daysBetween, gradeCard, quizChoices, sameDay, sessionLength, todayKey } from "./srsEngine.js";
+import { tutorSpeech } from "./tutorsData.js";
 
 const russianAlphabet = [
   { upper: "А", lower: "а", name: "A", hint: "Comme le a de « papa ».", example: "мама", exampleBack: "maman", speak: "а" },
@@ -216,15 +217,18 @@ const courses = {
       grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "Écoutez la lettre, puis répétez-la tout bas.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
-      speak: "Je le dis. Vous le reprenez.",
+      warmup: "Trois mots déjà vus, pour reprendre pied.",
+      discover: "Mot nouveau. Écoutez, regardez l’écriture, puis le sens.",
+      quiz: "Sans aide. Choisissez le mot juste.",
+      dialogue: "Deux répliques, seulement avec les mots de la séance.",
       done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
     },
     alphabet: russianAlphabet,
     words: russianWords,
     grammar: russianGrammar,
     teachers: [
-      { id: "nina", name: "Nina Sokolova", role: "Professeure de russe", portrait: "nina.jpg", hello: "Je m’appelle Nina. Une lettre, une règle, puis les mots qui reviennent." },
-      { id: "pavel", name: "Pavel Volkov", role: "Professeur de russe", portrait: "pavel.jpg", hello: "Je m’appelle Pavel. Une lettre, une règle, puis les mots qui reviennent." },
+      { id: "nina", name: "Nina Sokolova", role: "Professeure de russe", portrait: "nina.jpg", hello: "Je m’appelle Nina. Neuf cartes, pas davantage. Les mots reviennent tout seuls." },
+      { id: "pavel", name: "Pavel Volkov", role: "Professeur de russe", portrait: "pavel.jpg", hello: "Je m’appelle Pavel. Neuf cartes, puis on s’arrête. Les mots reviennent tout seuls." },
     ],
     labels: {
       front: "Russe",
@@ -250,14 +254,24 @@ const courses = {
       finished: "Séance terminée",
       againTitle: "On peut recommencer",
       ready: "Cinq minutes",
-      lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+      lobbyBody: "Neuf cartes au plus : trois révisions, trois mots nouveaux, trois questions.",
       doneTitle: "À demain",
       held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
       streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
       letterStep: (i, n) => `Alphabet · ${i} sur ${n}`,
       wordStep: (i, n) => `Mots · ${i} sur ${n}`,
       speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
-      plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+      warmupStep: (i, n) => `Échauffement · ${i} sur ${n}`,
+      discoverStep: (i, n) => `Découverte · ${i} sur ${n}`,
+      quizStep: (i, n) => `Ancrage · ${i} sur ${n}`,
+      dialogueStep: "Dialogue",
+      translate: (meaning) => `Comment dit-on « ${meaning} » ?`,
+      cloze: (meaning) => `Complétez : « ___ », c’est ${meaning}.`,
+      continueLabel: "Continuer",
+      you: "Vous",
+      jokerNote: "Un jour a sauté. Le joker a gardé la série.",
+      jokerPending: (n) => `Hier a sauté. Finissez aujourd’hui : le joker garde vos ${n} jours.`,
+      plan: (warmup, fresh, quiz) => `Échauffement ${warmup} · nouveaux ${fresh} · quiz ${quiz}`,
       install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
       noVoice: "La voix n’est pas disponible ici. Suivez l’écriture.",
     },
@@ -273,15 +287,18 @@ const courses = {
       grammar: "Правило дня. Послушайте два примера.",
       alphabet: "Слушайте букву и повторите её тихо.",
       vocab: "Если слово ушло, нажмите «Повторить». Оно вернётся.",
-      speak: "Я говорю. Вы повторяете.",
+      warmup: "Три знакомых слова, чтобы войти в урок.",
+      discover: "Новое слово. Слушайте и смотрите запись.",
+      quiz: "Без подсказки. Выберите верное слово.",
+      dialogue: "Две реплики, только со словами этого урока.",
       done: "На сегодня достаточно. Завтра эти слова вернутся.",
     },
     alphabet: frenchAlphabet,
     words: frenchWords,
     grammar: frenchGrammar,
     teachers: [
-      { id: "sophie", name: "Sophie Montaigne", role: "Professeure de français", portrait: "sophie.jpg", hello: "Меня зовут Софи Монтень. Одна буква, одно правило, затем слова." },
-      { id: "louis", name: "Louis Beaumont", role: "Professeur de français", portrait: "louis.jpg", hello: "Меня зовут Луи Бомон. Одна буква, одно правило, затем слова." },
+      { id: "sophie", name: "Sophie Montaigne", role: "Professeure de français", portrait: "sophie.jpg", hello: "Меня зовут Софи Монтень. Девять карточек, и на сегодня хватит." },
+      { id: "louis", name: "Louis Beaumont", role: "Professeur de français", portrait: "louis.jpg", hello: "Меня зовут Луи Бомон. Девять карточек, и на сегодня хватит." },
     ],
     labels: {
       front: "Французский",
@@ -307,7 +324,7 @@ const courses = {
       finished: "Урок закончен",
       againTitle: "Можно ещё раз",
       ready: "Пять минут",
-      lobbyBody: "Сначала то, что забывается, потом немного нового.",
+      lobbyBody: "Не больше девяти карточек : повтор, новые слова, короткая проверка.",
       doneTitle: "До завтра",
       held: (time) => `Вы занимались ${time}. Я верну эти слова.`,
       streak: (n) => {
@@ -319,7 +336,17 @@ const courses = {
       letterStep: (i, n) => `Буквы · ${i} из ${n}`,
       wordStep: (i, n) => `Слова · ${i} из ${n}`,
       speakStep: (i, n) => `Произношение · ${i} из ${n}`,
-      plan: (reviews, fresh) => `${reviews} на повтор · ${fresh} новых`,
+      warmupStep: (i, n) => `Разминка · ${i} из ${n}`,
+      discoverStep: (i, n) => `Новые слова · ${i} из ${n}`,
+      quizStep: (i, n) => `Проверка · ${i} из ${n}`,
+      dialogueStep: "Диалог",
+      translate: (meaning) => `Как сказать « ${meaning} »?`,
+      cloze: (meaning) => `Дополните : « ___ » — ${meaning}.`,
+      continueLabel: "Дальше",
+      you: "Вы",
+      jokerNote: "Один день пропущен. Серия сохранена.",
+      jokerPending: (n) => `Вчера пропущено. Джокер сохранит серию (${n}), если вы закончите сегодня.`,
+      plan: (warmup, fresh, quiz) => `Разминка ${warmup} · новые ${fresh} · проверка ${quiz}`,
       install: "iPhone: Поделиться → На экран «Домой». Android: меню браузера → Установить.",
       noVoice: "Голос здесь недоступен. Смотрите на запись произношения.",
     },
@@ -335,15 +362,18 @@ const courses = {
       grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "Écoutez ce son, puis répétez-le tout bas.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
-      speak: "Je le dis. Vous le reprenez.",
+      warmup: "Trois mots déjà vus, pour reprendre pied.",
+      discover: "Mot nouveau. Écoutez, regardez l’écriture, puis le sens.",
+      quiz: "Sans aide. Choisissez le mot juste.",
+      dialogue: "Deux répliques, seulement avec les mots de la séance.",
       done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
     },
     alphabet: bretonAlphabet,
     words: bretonWords,
     grammar: bretonGrammar,
     teachers: [
-      { id: "enora", name: "Enora Le Gall", role: "Professeure de breton", portrait: "enora.jpg", hello: "Je m’appelle Enora Le Gall. Un son du breton, une règle, puis des mots." },
-      { id: "yann", name: "Yann Madec", role: "Professeur de breton", portrait: "yann.jpg", hello: "Je m’appelle Yann Madec. Un son du breton, une règle, puis des mots." },
+      { id: "enora", name: "Enora Le Gall", role: "Professeure de breton", portrait: "enora.jpg", hello: "Je m’appelle Enora Le Gall. Neuf cartes, tout doucement. Les mots reviennent." },
+      { id: "yann", name: "Yann Madec", role: "Professeur de breton", portrait: "yann.jpg", hello: "Je m’appelle Yann Madec. Neuf cartes, puis on s’arrête. Les mots reviennent." },
     ],
     labels: {
       front: "Breton",
@@ -369,14 +399,24 @@ const courses = {
       finished: "Séance terminée",
       againTitle: "On peut recommencer",
       ready: "Cinq minutes",
-      lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+      lobbyBody: "Neuf cartes au plus : trois révisions, trois mots nouveaux, trois questions.",
       doneTitle: "À demain",
       held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
       streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
       letterStep: (i, n) => `Son · ${i} sur ${n}`,
       wordStep: (i, n) => `Mots · ${i} sur ${n}`,
       speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
-      plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+      warmupStep: (i, n) => `Échauffement · ${i} sur ${n}`,
+      discoverStep: (i, n) => `Découverte · ${i} sur ${n}`,
+      quizStep: (i, n) => `Ancrage · ${i} sur ${n}`,
+      dialogueStep: "Dialogue",
+      translate: (meaning) => `Comment dit-on « ${meaning} » ?`,
+      cloze: (meaning) => `Complétez : « ___ », c’est ${meaning}.`,
+      continueLabel: "Continuer",
+      you: "Vous",
+      jokerNote: "Un jour a sauté. Le joker a gardé la série.",
+      jokerPending: (n) => `Hier a sauté. Finissez aujourd’hui : le joker garde vos ${n} jours.`,
+      plan: (warmup, fresh, quiz) => `Échauffement ${warmup} · nouveaux ${fresh} · quiz ${quiz}`,
       install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
       noVoice: "La voix bretonne n’est pas toujours disponible. Suivez l’écriture.",
     },
@@ -608,14 +648,24 @@ function courseInFrench(front) {
     finished: "Séance terminée",
     againTitle: "On peut recommencer",
     ready: "Cinq minutes",
-    lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+    lobbyBody: "Neuf cartes au plus : trois révisions, trois mots nouveaux, trois questions.",
     doneTitle: "À demain",
     held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
     streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
     letterStep: (i, n) => `Son · ${i} sur ${n}`,
     wordStep: (i, n) => `Mots · ${i} sur ${n}`,
     speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
-    plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+    warmupStep: (i, n) => `Échauffement · ${i} sur ${n}`,
+    discoverStep: (i, n) => `Découverte · ${i} sur ${n}`,
+    quizStep: (i, n) => `Ancrage · ${i} sur ${n}`,
+    dialogueStep: "Dialogue",
+    translate: (meaning) => `Comment dit-on « ${meaning} » ?`,
+    cloze: (meaning) => `Complétez : « ___ », c’est ${meaning}.`,
+    continueLabel: "Continuer",
+    you: "Vous",
+    jokerNote: "Un jour a sauté. Le joker a gardé la série.",
+    jokerPending: (n) => `Hier a sauté. Finissez aujourd’hui : le joker garde vos ${n} jours.`,
+    plan: (warmup, fresh, quiz) => `Échauffement ${warmup} · nouveaux ${fresh} · quiz ${quiz}`,
     install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
     noVoice: "La voix n’est pas disponible ici. Suivez l’écriture.",
   };
@@ -633,15 +683,18 @@ Object.assign(courses, {
       grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "Écoutez ce son, puis répétez-le tout bas.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
-      speak: "Je le dis. Vous le reprenez.",
+      warmup: "Trois mots déjà vus, pour reprendre pied.",
+      discover: "Mot nouveau. Écoutez, regardez l’écriture, puis le sens.",
+      quiz: "Sans aide. Choisissez le mot juste.",
+      dialogue: "Deux répliques, seulement avec les mots de la séance.",
       done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
     },
     alphabet: japaneseAlphabet,
     words: japaneseWords,
     grammar: japaneseGrammar,
     teachers: [
-      { id: "hana", name: "Hana Mori", role: "Professeure de japonais", portrait: "hana.jpg", hello: "Je m’appelle Hana Mori. Un son, une règle, puis des mots." },
-      { id: "haruto", name: "Haruto Sato", role: "Professeur de japonais", portrait: "haruto.jpg", hello: "Je m’appelle Haruto Sato. Un son, une règle, puis des mots." },
+      { id: "hana", name: "Hana Mori", role: "Professeure de japonais", portrait: "hana.jpg", hello: "Je m’appelle Hana Mori. Neuf cartes, pas davantage. Écoutez, puis répondez." },
+      { id: "haruto", name: "Haruto Sato", role: "Professeur de japonais", portrait: "haruto.jpg", hello: "Je m’appelle Haruto Sato. Neuf cartes, puis on s’arrête." },
     ],
     labels: courseInFrench("Japonais"),
   },
@@ -656,15 +709,18 @@ Object.assign(courses, {
       grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "Écoutez ce ton, puis répétez-le tout bas.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
-      speak: "Je le dis. Vous le reprenez.",
+      warmup: "Trois mots déjà vus, pour reprendre pied.",
+      discover: "Mot nouveau. Écoutez, regardez l’écriture, puis le sens.",
+      quiz: "Sans aide. Choisissez le mot juste.",
+      dialogue: "Deux répliques, seulement avec les mots de la séance.",
       done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
     },
     alphabet: chineseAlphabet,
     words: chineseWords,
     grammar: chineseGrammar,
     teachers: [
-      { id: "mei", name: "Mei Lin", role: "Professeure de chinois", portrait: "mei.jpg", hello: "Je m’appelle Mei Lin. Un ton, une règle, puis des mots." },
-      { id: "chen", name: "Wei Chen", role: "Professeur de chinois", portrait: "chen.jpg", hello: "Je m’appelle Wei Chen. Un ton, une règle, puis des mots." },
+      { id: "mei", name: "Mei Lin", role: "Professeure de chinois", portrait: "mei.jpg", hello: "Je m’appelle Mei Lin. Neuf cartes. Écoutez le ton, puis choisissez le mot juste." },
+      { id: "chen", name: "Wei Chen", role: "Professeur de chinois", portrait: "chen.jpg", hello: "Je m’appelle Wei Chen. Neuf cartes, puis on s’arrête." },
     ],
     labels: courseInFrench("Chinois"),
   },
@@ -680,15 +736,18 @@ Object.assign(courses, {
       grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "L’arabe se lit de droite à gauche. Écoutez la lettre.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
-      speak: "Je le dis. Vous le reprenez.",
+      warmup: "Trois mots déjà vus, pour reprendre pied.",
+      discover: "Mot nouveau. Écoutez, regardez l’écriture, puis le sens.",
+      quiz: "Sans aide. Choisissez le mot juste.",
+      dialogue: "Deux répliques, seulement avec les mots de la séance.",
       done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
     },
     alphabet: arabicAlphabet,
     words: arabicWords,
     grammar: arabicGrammar,
     teachers: [
-      { id: "layla", name: "Layla Haddad", role: "Professeure d’arabe", portrait: "layla.jpg", hello: "Je m’appelle Layla Haddad. Une lettre, une règle, puis des mots." },
-      { id: "karim", name: "Karim Nassar", role: "Professeur d’arabe", portrait: "karim.jpg", hello: "Je m’appelle Karim Nassar. Une lettre, une règle, puis des mots." },
+      { id: "layla", name: "Layla Haddad", role: "Professeure d’arabe", portrait: "layla.jpg", hello: "Je m’appelle Layla Haddad. Neuf cartes, de droite à gauche. Les mots reviennent." },
+      { id: "karim", name: "Karim Nassar", role: "Professeur d’arabe", portrait: "karim.jpg", hello: "Je m’appelle Karim Nassar. Neuf cartes, puis on s’arrête." },
     ],
     labels: courseInFrench("Arabe"),
   },
@@ -710,26 +769,10 @@ const brandSub = document.getElementById("brand-sub");
 let course = null;
 let teacher = null;
 let screen = "pick";
-let cursor = 0;
 let session = null;
 let startedAt = null;
 let timerId = null;
 let finishedSeconds = null;
-
-function dateKey(date) {
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-}
-
-function todayKey() {
-  return dateKey(new Date());
-}
-
-function addDays(key, days) {
-  const [year, month, day] = key.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-  date.setDate(date.getDate() + days);
-  return dateKey(date);
-}
 
 function loadProgress(id) {
   try {
@@ -743,38 +786,72 @@ function saveProgress(data) {
   localStorage.setItem(`yezh-${course.id}`, JSON.stringify(data));
 }
 
-function buildSession(progress) {
-  const today = todayKey();
-  const reviews = [];
-  const fresh = [];
-  course.words.forEach((_, index) => {
-    const state = progress.cards[index];
-    if (!state) fresh.push(index);
-    else if (state.due <= today) reviews.push(index);
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function previewSession(progress) {
+  if (sameDay(progress.savedDay, todayKey()) && progress.savedSession?.version === 2) return progress.savedSession;
+  return buildDaySession({
+    wordCount: course.words.length,
+    cards: progress.cards,
+    today: todayKey(),
+    seed: `${course.id}:${todayKey()}`,
   });
-  let wordIds = reviews.slice(0, 4);
-  const freshCount = wordIds.length ? Math.min(2, 6 - wordIds.length, fresh.length) : Math.min(4, fresh.length);
-  const newIds = fresh.slice(0, freshCount);
-  wordIds = wordIds.concat(newIds);
-  if (!wordIds.length) {
-    wordIds = [0, 1, 2].filter((index) => course.words[index]);
+}
+
+function openCourse() {
+  const progress = loadProgress(course.id);
+  const saved = sameDay(progress.savedDay, todayKey()) && progress.savedSession?.version === 2;
+  session = saved ? progress.savedSession : previewSession(progress);
+  if (!saved) {
+    progress.savedDay = todayKey();
+    progress.savedSession = session;
+    saveProgress(progress);
   }
-  const letterIsNew = progress.nextLetter < course.alphabet.length;
-  const letterIndex = letterIsNew ? progress.nextLetter : progress.letterCycle % course.alphabet.length;
-  return {
-    wordIds,
-    newIds,
-    letterIndex,
-    letterIsNew,
-    grammarIndex: Math.floor(Date.now() / 86400000) % course.grammar.length,
-    speaks: wordIds.slice(0, 3),
-  };
+}
+
+function persistSession() {
+  const progress = loadProgress(course.id);
+  progress.savedDay = todayKey();
+  progress.savedSession = session;
+  saveProgress(progress);
+}
+
+function commitGrade(index, knew) {
+  const progress = loadProgress(course.id);
+  progress.cards[index] = gradeCard(progress.cards[index], {
+    knew,
+    introducedToday: session.fresh.includes(index),
+    today: todayKey(),
+  });
+  progress.savedDay = todayKey();
+  progress.savedSession = session;
+  saveProgress(progress);
+}
+
+function setGauge() {
+  const gauge = document.getElementById("gauge");
+  const fill = document.getElementById("gauge-fill");
+  if (!gauge || !fill) return;
+  const visible = session && screen !== "pick" && screen !== "lobby";
+  gauge.hidden = !visible;
+  const total = session ? sessionLength(session) : 0;
+  const done = session?.doneCount || 0;
+  fill.style.width = total ? `${Math.min(100, Math.round((done / total) * 100))}%` : "0%";
+  gauge.setAttribute("aria-valuemax", String(total || 9));
+  gauge.setAttribute("aria-valuenow", String(Math.min(done, total)));
+  if (course) gauge.setAttribute("aria-label", course.labels.ready);
 }
 
 function speak(text) {
   const labels = course.labels;
-  if (!("speechSynthesis" in window)) {
-    lineEl.textContent = labels.noVoice;
+  if (!("speechSynthesis" in window) || !text) {
+    if (!("speechSynthesis" in window)) lineEl.textContent = labels.noVoice;
     return;
   }
   const utterance = new SpeechSynthesisUtterance(text);
@@ -790,7 +867,7 @@ function glyphRow(glyphs) {
   if (!glyphs || !glyphs.length) return "";
   return `<span class="glyphs">${glyphs.map((glyph) => {
     const item = Array.isArray(glyph) ? { c: glyph[0], p: glyph[1], m: glyph[2] } : glyph;
-    return `<span class="glyph"><b ${scriptAttrs()}>${item.c}</b><i>${item.p}</i><small>${item.m}</small></span>`;
+    return `<span class="glyph"><b ${scriptAttrs()}>${escapeHtml(item.c)}</b><i>${escapeHtml(item.p)}</i><small>${escapeHtml(item.m)}</small></span>`;
   }).join("")}</span>`;
 }
 
@@ -845,16 +922,14 @@ function showTeacher(line) {
   document.documentElement.lang = course.ui;
 }
 
-function openCourse() {
-  const progress = loadProgress(course.id);
-  if (progress.savedDay === todayKey() && progress.savedSession) {
-    session = progress.savedSession;
-    return;
-  }
-  session = buildSession(progress);
-  progress.savedDay = todayKey();
-  progress.savedSession = session;
-  saveProgress(progress);
+function dayLetter(progress) {
+  const past = (progress.nextLetter || 0) >= course.alphabet.length;
+  const index = past ? (progress.letterCycle || 0) % course.alphabet.length : (progress.nextLetter || 0);
+  return course.alphabet[index];
+}
+
+function dayGrammar() {
+  return course.grammar[Math.floor(Date.now() / 86400000) % course.grammar.length];
 }
 
 function showPick() {
@@ -882,39 +957,40 @@ function showPick() {
       </div>
     </article>
   `).join("");
-  const later = soon.map((item) => `
-    <button class="course soon" type="button" disabled>
-      <span class="dot" aria-hidden="true"></span>
-      <span><strong>${item.title}</strong><span>${item.note}</span></span>
-    </button>
-  `).join("");
   stage.innerHTML = `
     <article class="panel">
       <h2>Choisissez qui vous guide</h2>
-      <p>Une fille ou un garçon, pour cinq minutes. Russe, français, breton, japonais, chinois et arabe. Les mots reviennent les jours suivants.</p>
+      <p>Une fille ou un garçon, pour cinq minutes. Neuf cartes : révision, mots nouveaux, quiz. Un jour sauté ne casse pas la série.</p>
     </article>
-    <div class="courses">${blocks}${later}</div>
+    <div class="courses">${blocks}</div>
   `;
   setActions([]);
+  setGauge();
 }
 
 function showLobby() {
   screen = "lobby";
   const progress = loadProgress(course.id);
-  const plan = progress.savedDay === todayKey() && progress.savedSession ? progress.savedSession : buildSession(progress);
-  const reviews = plan.wordIds.length - plan.newIds.length;
-  const doneToday = progress.lastDone === todayKey();
+  const plan = previewSession(progress);
+  const doneToday = sameDay(progress.lastDone, todayKey());
+  const letter = dayLetter(progress);
+  const grammar = dayGrammar();
+  const gap = progress.lastDone ? daysBetween(progress.lastDone, todayKey()) : 0;
   showTeacher(teacher.hello);
   stepEl.textContent = doneToday ? course.labels.already : course.labels.session;
   clockEl.hidden = false;
   clockEl.textContent = "5 min";
-  const streak = progress.streak ? `<p class="streak">${course.labels.streak(progress.streak)}</p>` : "";
+  let streak = "";
+  if (progress.streak && (doneToday || gap <= 1)) streak = `<p class="streak">${course.labels.streak(progress.streak)}</p>`;
+  else if (progress.streak && gap === 2) streak = `<p class="streak">${course.labels.jokerPending(progress.streak)}</p>`;
   stage.innerHTML = `
     <article class="panel">
       ${streak}
       <h2>${doneToday ? course.labels.againTitle : course.labels.ready}</h2>
       <p>${course.labels.lobbyBody}</p>
-      <p class="hint">${course.labels.plan(reviews, plan.newIds.length)}</p>
+      <p class="hint">${course.labels.plan(plan.warmup.length, plan.fresh.length, plan.quiz.length)}</p>
+      <p class="hint">${escapeHtml(letter.name)} · ${escapeHtml(letter.hint)}</p>
+      <p class="hint">${escapeHtml(grammar.title)}</p>
     </article>
     <p class="install">${course.labels.install}</p>
   `;
@@ -922,67 +998,28 @@ function showLobby() {
     { label: course.labels.backHome, action: "pick" },
     { label: course.labels.start, action: "start", primary: true },
   ]);
+  setGauge();
 }
 
-function showAlphabet() {
-  screen = "alphabet";
-  const letter = course.alphabet[session.letterIndex];
-  showTeacher(course.lines.alphabet);
-  stepEl.textContent = course.labels.letterStep(1, 1);
-  stage.innerHTML = `
-    <article class="panel">
-      <p class="mark">${letter.name}</p>
-      <p class="letter" ${scriptAttrs()}>${letter.upper} ${letter.lower}</p>
-      <p class="hint">${letter.hint}</p>
-      <p class="example">${letter.example} · ${letter.exampleBack}</p>
-      ${glyphRow(letter.glyphs)}
-    </article>
-  `;
-  setActions([
-    { label: course.labels.listen, action: "listen", primary: true },
-    { label: course.labels.toGrammar, action: "next" },
-  ]);
-}
-
-function showGrammar() {
-  screen = "grammar";
-  const item = course.grammar[(session.grammarIndex || 0) % course.grammar.length];
-  showTeacher(course.lines.grammar);
-  stepEl.textContent = course.labels.grammarStep;
-  stage.innerHTML = `
-    <article class="panel">
-      <p class="mark">${item.title}</p>
-      <p class="rule">${item.rule}</p>
-      <div class="examples">
-        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong ${scriptAttrs()}>${example.target}</strong><span>${example.gloss}</span>${glyphRow(example.glyphs)}</button>`).join("")}
-      </div>
-    </article>
-  `;
-  setActions([
-    { label: course.labels.toWords, action: "next", primary: true, wide: true },
-  ]);
-}
-
-function showVocab() {
-  screen = "vocab";
-  const index = session.wordIds[cursor];
+function showWarmup() {
+  screen = "warmup";
+  const index = session.warmup[session.cursor];
   const word = course.words[index];
-  const isNew = session.newIds.includes(index);
-  showTeacher(course.lines.vocab);
-  stepEl.textContent = course.labels.wordStep(cursor + 1, session.wordIds.length);
+  showTeacher(course.lines.warmup);
+  stepEl.textContent = course.labels.warmupStep(session.cursor + 1, session.warmup.length);
   stage.innerHTML = `
     <button class="card" id="card" type="button" aria-pressed="false">
       <span class="card-inner">
         <span class="face face-front">
-          <span class="tag">${isNew ? course.labels.fresh : course.labels.review}</span>
-          <span class="word" ${scriptAttrs()}>${word.front}</span>
-          <span class="phonetic">${word.phonetic}</span>
+          <span class="tag">${course.labels.review}</span>
+          <span class="word" ${scriptAttrs()}>${escapeHtml(word.front)}</span>
+          <span class="phonetic">${escapeHtml(word.phonetic)}</span>
           ${glyphRow(word.glyphs)}
           <span class="face-label">${course.labels.front}</span>
         </span>
         <span class="face face-back">
-          <span class="tag">${word.category}</span>
-          <span class="word">${word.back}</span>
+          <span class="tag">${escapeHtml(word.category)}</span>
+          <span class="word">${escapeHtml(word.back)}</span>
           <span class="face-label">${course.labels.back}</span>
         </span>
       </span>
@@ -994,76 +1031,193 @@ function showVocab() {
     { label: course.labels.again, action: "again" },
     { label: course.labels.know, action: "know", primary: true },
   ]);
+  setGauge();
 }
 
-function showSpeak() {
-  screen = "speak";
-  const index = session.speaks[cursor];
+function showFresh() {
+  screen = "fresh";
+  const index = session.fresh[session.cursor];
   const word = course.words[index];
-  showTeacher(course.lines.speak);
-  stepEl.textContent = course.labels.speakStep(cursor + 1, session.speaks.length);
+  showTeacher(course.lines.discover);
+  stepEl.textContent = course.labels.discoverStep(session.cursor + 1, session.fresh.length);
   stage.innerHTML = `
     <article class="panel">
-      <p class="mark">${word.back}</p>
-      <p class="word" ${scriptAttrs()}>${word.front}</p>
-      <p class="phonetic">${word.phonetic}</p>
+      <p class="mark">${course.labels.fresh}</p>
+      <p class="word" ${scriptAttrs()}>${escapeHtml(word.front)}</p>
+      <p class="phonetic">${escapeHtml(word.phonetic)}</p>
       ${glyphRow(word.glyphs)}
+      <p class="hint">${escapeHtml(word.back)}</p>
     </article>
   `;
-  const last = cursor === session.speaks.length - 1;
   setActions([
-    { label: course.labels.listen, action: "listen", primary: true },
-    { label: last ? course.labels.finish : course.labels.repeated, action: "next" },
+    { label: course.labels.listen, action: "listen" },
+    { label: course.labels.again, action: "again" },
+    { label: course.labels.know, action: "know", primary: true },
   ]);
+  setGauge();
+  speak(word.speak);
 }
 
-function markDone() {
-  const progress = loadProgress(course.id);
-  const today = todayKey();
-  if (progress.lastDone !== today) {
-    const yesterday = addDays(today, -1);
-    progress.streak = progress.lastDone === yesterday ? progress.streak + 1 : 1;
-    progress.lastDone = today;
-  }
-  if (progress.letterMarked !== today) {
-    if (session.letterIsNew) progress.nextLetter += 1;
-    else progress.letterCycle += 1;
-    progress.letterMarked = today;
-  }
-  saveProgress(progress);
-  return progress;
+function showQuiz() {
+  screen = "quiz";
+  session.quizAwait = false;
+  const index = session.quiz[session.cursor];
+  const word = course.words[index];
+  const choiceIds = quizChoices(course.words.length, index, `${course.id}:${todayKey()}`);
+  session.quizChoiceIds = choiceIds;
+  const prompt = session.cursor % 2 === 1 ? course.labels.cloze(word.back) : course.labels.translate(word.back);
+  showTeacher(course.lines.quiz);
+  stepEl.textContent = course.labels.quizStep(session.cursor + 1, session.quiz.length);
+  stage.innerHTML = `
+    <article class="panel">
+      <p class="mark">${escapeHtml(prompt)}</p>
+      <div class="choices">
+        ${choiceIds.map((id, choice) => `<button type="button" class="choice" data-choice="${choice}"><span ${scriptAttrs()}>${escapeHtml(course.words[id].front)}</span></button>`).join("")}
+      </div>
+    </article>
+  `;
+  setActions([{ label: course.labels.listen, action: "listen" }]);
+  setGauge();
 }
 
-function grade(knew) {
+function sessionWords() {
+  const ids = [...session.fresh, ...session.warmup, ...session.quiz];
+  const first = course.words[ids[0]] || course.words[0];
+  const second = course.words[ids[1]] || first;
+  return { first, second };
+}
+
+function showDialogue() {
+  screen = "dialogue";
+  const { first, second } = sessionWords();
   const progress = loadProgress(course.id);
-  const index = session.wordIds[cursor];
-  const previous = progress.cards[index];
-  const box = knew ? Math.min((previous?.box ?? -1) + 1, intervals.length - 1) : 0;
-  progress.cards[index] = { box, due: addDays(todayKey(), knew ? intervals[box] : 1) };
-  saveProgress(progress);
-  if (cursor < session.wordIds.length - 1) {
-    cursor += 1;
-    showVocab();
-  } else {
-    cursor = 0;
-    showSpeak();
-  }
+  const speech = tutorSpeech(teacher.id, first, second, progress.streak || 0, false);
+  session.dialogueSay = first.speak;
+  showTeacher(course.lines.dialogue);
+  stepEl.textContent = course.labels.dialogueStep;
+  stage.innerHTML = `
+    <article class="panel dialogue">
+      <p class="who-line">${escapeHtml(teacher.name)}</p>
+      <p>${escapeHtml(speech.ask)}</p>
+      <p class="who-line">${course.labels.you}</p>
+      <p>${escapeHtml(speech.reply)}</p>
+      <button type="button" class="example-btn" data-say="${escapeHtml(first.speak)}"><strong ${scriptAttrs()}>${escapeHtml(first.front)}</strong><span>${escapeHtml(first.back)}</span></button>
+      <button type="button" class="example-btn" data-say="${escapeHtml(second.speak)}"><strong ${scriptAttrs()}>${escapeHtml(second.front)}</strong><span>${escapeHtml(second.back)}</span></button>
+    </article>
+  `;
+  setActions([{ label: course.labels.finish, action: "next", primary: true, wide: true }]);
+  setGauge();
+  speak(first.speak);
 }
 
 function showDone() {
   screen = "done";
   stopTimer();
-  const progress = markDone();
-  showTeacher(course.lines.done);
+  const progress = loadProgress(course.id);
+  const result = applyStreak(progress, todayKey());
+  if (!result.already) {
+    progress.streak = result.streak;
+    progress.lastDone = result.lastDone;
+    progress.lastJoker = result.usedJoker ? todayKey() : "";
+    if (!sameDay(progress.letterMarked, todayKey())) {
+      if ((progress.nextLetter || 0) < course.alphabet.length) progress.nextLetter = (progress.nextLetter || 0) + 1;
+      else progress.letterCycle = (progress.letterCycle || 0) + 1;
+      progress.letterMarked = todayKey();
+    }
+  }
+  session.phase = "done";
+  progress.savedDay = todayKey();
+  progress.savedSession = session;
+  saveProgress(progress);
+  const { first, second } = sessionWords();
+  const joker = result.usedJoker || sameDay(progress.lastJoker, todayKey());
+  const speech = tutorSpeech(teacher.id, first, second, progress.streak, joker);
+  showTeacher(speech.close);
   stepEl.textContent = course.labels.finished;
+  const jokerLine = joker ? `<p class="hint">${course.labels.jokerNote}</p>` : "";
   stage.innerHTML = `
     <article class="panel">
       <p class="streak">${course.labels.streak(progress.streak)}</p>
       <h2>${course.labels.doneTitle}</h2>
       <p>${course.labels.held(formatClock(finishedSeconds || 0))}</p>
+      ${jokerLine}
     </article>
   `;
   setActions([{ label: course.labels.doneHome, action: "pick", primary: true, wide: true }]);
+  setGauge();
+}
+
+function renderPhase() {
+  if (session.phase === "warmup") showWarmup();
+  else if (session.phase === "fresh") showFresh();
+  else if (session.phase === "quiz") showQuiz();
+  else if (session.phase === "dialogue") showDialogue();
+  else showDone();
+}
+
+function advancePhase() {
+  const order = ["warmup", "fresh", "quiz", "dialogue"];
+  let index = order.indexOf(session.phase);
+  session.cursor = 0;
+  while (index < order.length - 1) {
+    index += 1;
+    const next = order[index];
+    if (next === "dialogue" || session[next].length) {
+      session.phase = next;
+      persistSession();
+      renderPhase();
+      return;
+    }
+  }
+  session.phase = "done";
+  showDone();
+}
+
+function answerCard(knew) {
+  const list = session[session.phase];
+  const index = list[session.cursor];
+  commitGrade(index, knew);
+  session.doneCount += 1;
+  if (session.cursor < list.length - 1) {
+    session.cursor += 1;
+    persistSession();
+    renderPhase();
+    return;
+  }
+  advancePhase();
+}
+
+function finishQuizCard() {
+  commitGrade(session.pendingGrade.index, session.pendingGrade.knew);
+  session.quizAwait = false;
+  session.doneCount += 1;
+  if (session.cursor < session.quiz.length - 1) {
+    session.cursor += 1;
+    persistSession();
+    showQuiz();
+    return;
+  }
+  advancePhase();
+}
+
+function pickChoice(button) {
+  if (screen !== "quiz" || session.quizAwait) return;
+  const choice = Number(button.dataset.choice);
+  const index = session.quiz[session.cursor];
+  const chosen = session.quizChoiceIds[choice];
+  const knew = chosen === index;
+  session.quizAwait = true;
+  button.classList.add(knew ? "good" : "bad");
+  if (!knew) {
+    const right = [...stage.querySelectorAll("[data-choice]")].find((item) => session.quizChoiceIds[Number(item.dataset.choice)] === index);
+    if (right) right.classList.add("good");
+    speak(course.words[index].speak);
+    session.pendingGrade = { index, knew: false };
+    setActions([{ label: course.labels.continueLabel, action: "next", primary: true, wide: true }]);
+    return;
+  }
+  session.pendingGrade = { index, knew: true };
+  finishQuizCard();
 }
 
 function flipCard() {
@@ -1074,11 +1228,18 @@ function flipCard() {
 }
 
 function currentSpeakText() {
-  if (screen === "grammar") return course.grammar[(session.grammarIndex || 0) % course.grammar.length].examples[0].say;
-  if (screen === "alphabet") return course.alphabet[session.letterIndex].speak;
-  if (screen === "vocab") return course.words[session.wordIds[cursor]].speak;
-  if (screen === "speak") return course.words[session.speaks[cursor]].speak;
+  if (screen === "warmup") return course.words[session.warmup[session.cursor]].speak;
+  if (screen === "fresh") return course.words[session.fresh[session.cursor]].speak;
+  if (screen === "quiz") return course.words[session.quiz[session.cursor]].speak;
+  if (screen === "dialogue") return session.dialogueSay || "";
   return "";
+}
+
+function firstPhase(plan) {
+  if (plan.warmup.length) return "warmup";
+  if (plan.fresh.length) return "fresh";
+  if (plan.quiz.length) return "quiz";
+  return "dialogue";
 }
 
 const handlers = {
@@ -1086,37 +1247,32 @@ const handlers = {
     startedAt = null;
     finishedSeconds = null;
     if (timerId) clearInterval(timerId);
+    timerId = null;
+    session = null;
     showPick();
   },
   start() {
     openCourse();
+    if (!session.phase || session.phase === "done") {
+      session.phase = firstPhase(session);
+      session.cursor = 0;
+      session.doneCount = 0;
+      persistSession();
+    }
     startTimer();
     if ("speechSynthesis" in window) speechSynthesis.getVoices();
-    cursor = 0;
-    showAlphabet();
+    renderPhase();
   },
   listen() { speak(currentSpeakText()); },
   flip: flipCard,
-  again() { grade(false); },
-  know() { grade(true); },
+  again() { answerCard(false); },
+  know() { answerCard(true); },
   next() {
-    if (screen === "alphabet") {
-      cursor = 0;
-      showGrammar();
+    if (screen === "quiz" && session.quizAwait) {
+      finishQuizCard();
       return;
     }
-    if (screen === "grammar") {
-      cursor = 0;
-      if (session.wordIds.length) showVocab();
-      else showDone();
-      return;
-    }
-    if (screen === "speak") {
-      if (cursor < session.speaks.length - 1) {
-        cursor += 1;
-        showSpeak();
-      } else showDone();
-    }
+    if (screen === "dialogue") showDone();
   },
 };
 
@@ -1127,6 +1283,11 @@ actions.addEventListener("click", (event) => {
 });
 
 stage.addEventListener("click", (event) => {
+  const answer = event.target.closest("[data-choice]");
+  if (answer) {
+    pickChoice(answer);
+    return;
+  }
   const said = event.target.closest("[data-say]");
   if (said) {
     speak(said.dataset.say);
