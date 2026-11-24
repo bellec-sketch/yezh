@@ -175,6 +175,47 @@ export function buildDaySession({ wordCount, cards, today, seed }) {
   };
 }
 
+export const MILESTONE_EVERY = 7;
+export const CHECKPOINT_SIZE = 5;
+
+export function sessionsSoFar(progress) {
+  if (typeof progress.sessionsDone === "number") return progress.sessionsDone;
+  return progress.streak || 0;
+}
+
+export function checkpointDue(progress, today) {
+  if (progress.lastDone && sameDay(progress.lastDone, today)) return false;
+  const done = sessionsSoFar(progress);
+  const next = done + 1;
+  if (next > 0 && next % MILESTONE_EVERY === 0) return true;
+  const rewards = progress.rewards || [];
+  return Math.floor(done / MILESTONE_EVERY) > rewards.length;
+}
+
+export function nextMilestone(progress) {
+  const done = sessionsSoFar(progress);
+  return (Math.floor(done / MILESTONE_EVERY) + 1) * MILESTONE_EVERY;
+}
+
+export function buildCheckpoint({ wordCount, seenIds, seed, count = CHECKPOINT_SIZE }) {
+  const pool = seenIds && seenIds.length >= 4
+    ? seenIds.slice()
+    : Array.from({ length: wordCount }, (_, index) => index);
+  const random = mulberry32(hashString(seed));
+  const quiz = shuffle(pool, random).slice(0, Math.min(count, pool.length));
+  return {
+    version: 2,
+    checkpoint: true,
+    warmup: [],
+    fresh: [],
+    quiz,
+    startLevels: {},
+    doneCount: 0,
+    phase: "quiz",
+    cursor: 0,
+  };
+}
+
 export function sessionLength(session) {
   return session.warmup.length + session.fresh.length + session.quiz.length;
 }

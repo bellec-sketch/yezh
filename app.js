@@ -1,4 +1,4 @@
-import { applyStreak, buildDaySession, daysBetween, gradeCard, quizChoices, sameDay, sessionLength, todayKey } from "./srsEngine.js";
+import { applyStreak, buildCheckpoint, buildDaySession, checkpointDue, daysBetween, gradeCard, MILESTONE_EVERY, nextMilestone, quizChoices, sameDay, sessionLength, todayKey } from "./srsEngine.js";
 import { tutorSpeech } from "./tutorsData.js";
 
 const russianAlphabet = [
@@ -271,6 +271,13 @@ const courses = {
       you: "Vous",
       jokerNote: "Un jour a sauté. Le joker a gardé la série.",
       jokerPending: (n) => `Hier a sauté. Finissez aujourd’hui : le joker garde vos ${n} jours.`,
+      checkpointLead: "Sept séances. Cinq questions, sans piège.",
+      checkpointToday: "Aujourd’hui, le contrôle des sept séances. Une carte à la fin.",
+      checkpointStep: (i, n) => `Contrôle · ${i} sur ${n}`,
+      nextCheck: (n) => `Prochain contrôle à la séance ${n}`,
+      rewardLead: (name) => `${name} vous remet cette carte.`,
+      rewardTitle: (level) => `Palier ${level}`,
+      rewardBody: "Elle reste sur ce téléphone, avec votre série.",
       plan: (warmup, fresh, quiz) => `Échauffement ${warmup} · nouveaux ${fresh} · quiz ${quiz}`,
       install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
       noVoice: "La voix n’est pas disponible ici. Suivez l’écriture.",
@@ -346,6 +353,13 @@ const courses = {
       you: "Вы",
       jokerNote: "Один день пропущен. Серия сохранена.",
       jokerPending: (n) => `Вчера пропущено. Джокер сохранит серию (${n}), если вы закончите сегодня.`,
+      checkpointLead: "Семь занятий. Пять вопросов, без ловушки.",
+      checkpointToday: "Сегодня проверка за семь занятий. В конце карточка.",
+      checkpointStep: (i, n) => `Контроль · ${i} из ${n}`,
+      nextCheck: (n) => `Следующая проверка на занятии ${n}`,
+      rewardLead: (name) => `${name} дарит вам эту карточку.`,
+      rewardTitle: (level) => `Ступень ${level}`,
+      rewardBody: "Она остаётся на этом телефоне, вместе с серией.",
       plan: (warmup, fresh, quiz) => `Разминка ${warmup} · новые ${fresh} · проверка ${quiz}`,
       install: "iPhone: Поделиться → На экран «Домой». Android: меню браузера → Установить.",
       noVoice: "Голос здесь недоступен. Смотрите на запись произношения.",
@@ -416,6 +430,13 @@ const courses = {
       you: "Vous",
       jokerNote: "Un jour a sauté. Le joker a gardé la série.",
       jokerPending: (n) => `Hier a sauté. Finissez aujourd’hui : le joker garde vos ${n} jours.`,
+      checkpointLead: "Sept séances. Cinq questions, sans piège.",
+      checkpointToday: "Aujourd’hui, le contrôle des sept séances. Une carte à la fin.",
+      checkpointStep: (i, n) => `Contrôle · ${i} sur ${n}`,
+      nextCheck: (n) => `Prochain contrôle à la séance ${n}`,
+      rewardLead: (name) => `${name} vous remet cette carte.`,
+      rewardTitle: (level) => `Palier ${level}`,
+      rewardBody: "Elle reste sur ce téléphone, avec votre série.",
       plan: (warmup, fresh, quiz) => `Échauffement ${warmup} · nouveaux ${fresh} · quiz ${quiz}`,
       install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
       noVoice: "La voix bretonne n’est pas toujours disponible. Suivez l’écriture.",
@@ -665,6 +686,13 @@ function courseInFrench(front) {
     you: "Vous",
     jokerNote: "Un jour a sauté. Le joker a gardé la série.",
     jokerPending: (n) => `Hier a sauté. Finissez aujourd’hui : le joker garde vos ${n} jours.`,
+    checkpointLead: "Sept séances. Cinq questions, sans piège.",
+    checkpointToday: "Aujourd’hui, le contrôle des sept séances. Une carte à la fin.",
+    checkpointStep: (i, n) => `Contrôle · ${i} sur ${n}`,
+    nextCheck: (n) => `Prochain contrôle à la séance ${n}`,
+    rewardLead: (name) => `${name} vous remet cette carte.`,
+    rewardTitle: (level) => `Palier ${level}`,
+    rewardBody: "Elle reste sur ce téléphone, avec votre série.",
     plan: (warmup, fresh, quiz) => `Échauffement ${warmup} · nouveaux ${fresh} · quiz ${quiz}`,
     install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
     noVoice: "La voix n’est pas disponible ici. Suivez l’écriture.",
@@ -775,11 +803,22 @@ let timerId = null;
 let finishedSeconds = null;
 
 function loadProgress(id) {
+  let data = {};
   try {
-    return JSON.parse(localStorage.getItem(`yezh-${id}`)) || { streak: 0, lastDone: "", cards: {}, nextLetter: 0, letterCycle: 0 };
+    data = JSON.parse(localStorage.getItem(`yezh-${id}`)) || {};
   } catch {
-    return { streak: 0, lastDone: "", cards: {}, nextLetter: 0, letterCycle: 0 };
+    data = {};
   }
+  return {
+    streak: 0,
+    lastDone: "",
+    cards: {},
+    nextLetter: 0,
+    letterCycle: 0,
+    rewards: [],
+    ...data,
+    sessionsDone: typeof data.sessionsDone === "number" ? data.sessionsDone : (data.streak || 0),
+  };
 }
 
 function saveProgress(data) {
@@ -794,8 +833,19 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;");
 }
 
+function seenWordIds(progress) {
+  return Object.keys(progress.cards || {}).map(Number).filter((index) => course.words[index]);
+}
+
 function previewSession(progress) {
   if (sameDay(progress.savedDay, todayKey()) && progress.savedSession?.version === 2) return progress.savedSession;
+  if (checkpointDue(progress, todayKey())) {
+    return buildCheckpoint({
+      wordCount: course.words.length,
+      seenIds: seenWordIds(progress),
+      seed: `${course.id}:${todayKey()}:check`,
+    });
+  }
   return buildDaySession({
     wordCount: course.words.length,
     cards: progress.cards,
@@ -960,7 +1010,7 @@ function showPick() {
   stage.innerHTML = `
     <article class="panel">
       <h2>Choisissez qui vous guide</h2>
-      <p>Une fille ou un garçon, pour cinq minutes. Neuf cartes : révision, mots nouveaux, quiz. Un jour sauté ne casse pas la série.</p>
+      <p>Une fille ou un garçon, pour cinq minutes. Neuf cartes : révision, mots nouveaux, quiz. Toutes les sept séances, un contrôle, puis une carte du guide.</p>
     </article>
     <div class="courses">${blocks}</div>
   `;
@@ -976,6 +1026,7 @@ function showLobby() {
   const letter = dayLetter(progress);
   const grammar = dayGrammar();
   const gap = progress.lastDone ? daysBetween(progress.lastDone, todayKey()) : 0;
+  const rewards = progress.rewards || [];
   showTeacher(teacher.hello);
   stepEl.textContent = doneToday ? course.labels.already : course.labels.session;
   clockEl.hidden = false;
@@ -983,14 +1034,21 @@ function showLobby() {
   let streak = "";
   if (progress.streak && (doneToday || gap <= 1)) streak = `<p class="streak">${course.labels.streak(progress.streak)}</p>`;
   else if (progress.streak && gap === 2) streak = `<p class="streak">${course.labels.jokerPending(progress.streak)}</p>`;
+  const planLine = plan.checkpoint
+    ? course.labels.checkpointToday
+    : `${course.labels.plan(plan.warmup.length, plan.fresh.length, plan.quiz.length)}<br>${course.labels.nextCheck(nextMilestone(progress))}`;
+  const cardLine = rewards.length
+    ? `<img class="reward-thumb" src="reward-${teacher.id}.jpg" alt=""><p class="hint">${course.labels.rewardTitle(rewards.length)}</p>`
+    : "";
   stage.innerHTML = `
     <article class="panel">
       ${streak}
       <h2>${doneToday ? course.labels.againTitle : course.labels.ready}</h2>
       <p>${course.labels.lobbyBody}</p>
-      <p class="hint">${course.labels.plan(plan.warmup.length, plan.fresh.length, plan.quiz.length)}</p>
+      <p class="hint">${planLine}</p>
       <p class="hint">${escapeHtml(letter.name)} · ${escapeHtml(letter.hint)}</p>
       <p class="hint">${escapeHtml(grammar.title)}</p>
+      ${cardLine}
     </article>
     <p class="install">${course.labels.install}</p>
   `;
@@ -1065,9 +1123,13 @@ function showQuiz() {
   const word = course.words[index];
   const choiceIds = quizChoices(course.words.length, index, `${course.id}:${todayKey()}`);
   session.quizChoiceIds = choiceIds;
+  const lead = session.checkpoint ? course.labels.checkpointLead : course.lines.quiz;
+  const stepLabel = session.checkpoint
+    ? course.labels.checkpointStep(session.cursor + 1, session.quiz.length)
+    : course.labels.quizStep(session.cursor + 1, session.quiz.length);
   const prompt = session.cursor % 2 === 1 ? course.labels.cloze(word.back) : course.labels.translate(word.back);
-  showTeacher(course.lines.quiz);
-  stepEl.textContent = course.labels.quizStep(session.cursor + 1, session.quiz.length);
+  showTeacher(lead);
+  stepEl.textContent = stepLabel;
   stage.innerHTML = `
     <article class="panel">
       <p class="mark">${escapeHtml(prompt)}</p>
@@ -1119,6 +1181,12 @@ function showDone() {
     progress.streak = result.streak;
     progress.lastDone = result.lastDone;
     progress.lastJoker = result.usedJoker ? todayKey() : "";
+    progress.sessionsDone = (progress.sessionsDone || 0) + 1;
+    if (session.checkpoint) {
+      const level = Math.floor(progress.sessionsDone / MILESTONE_EVERY);
+      const rewards = progress.rewards || [];
+      if (level > 0 && !rewards.includes(level)) progress.rewards = rewards.concat(level);
+    }
     if (!sameDay(progress.letterMarked, todayKey())) {
       if ((progress.nextLetter || 0) < course.alphabet.length) progress.nextLetter = (progress.nextLetter || 0) + 1;
       else progress.letterCycle = (progress.letterCycle || 0) + 1;
@@ -1147,15 +1215,42 @@ function showDone() {
   setGauge();
 }
 
+function showReward() {
+  screen = "reward";
+  const progress = loadProgress(course.id);
+  const done = (progress.sessionsDone || 0) + (sameDay(progress.lastDone, todayKey()) ? 0 : 1);
+  const level = Math.max(1, Math.floor(done / MILESTONE_EVERY));
+  showTeacher(course.labels.rewardLead(teacher.name));
+  portraitEl.src = `reward-${teacher.id}.jpg`;
+  stepEl.textContent = course.labels.rewardTitle(level);
+  stage.innerHTML = `
+    <article class="panel">
+      <p class="mark">${course.labels.rewardTitle(level)}</p>
+      <h2>${escapeHtml(teacher.name)}</h2>
+      <p>${course.labels.rewardBody}</p>
+    </article>
+  `;
+  setActions([{ label: course.labels.finish, action: "next", primary: true, wide: true }]);
+  setGauge();
+}
+
 function renderPhase() {
   if (session.phase === "warmup") showWarmup();
   else if (session.phase === "fresh") showFresh();
   else if (session.phase === "quiz") showQuiz();
+  else if (session.phase === "reward") showReward();
   else if (session.phase === "dialogue") showDialogue();
   else showDone();
 }
 
 function advancePhase() {
+  if (session.checkpoint && session.phase === "quiz") {
+    session.phase = "reward";
+    session.cursor = 0;
+    persistSession();
+    showReward();
+    return;
+  }
   const order = ["warmup", "fresh", "quiz", "dialogue"];
   let index = order.indexOf(session.phase);
   session.cursor = 0;
@@ -1272,7 +1367,7 @@ const handlers = {
       finishQuizCard();
       return;
     }
-    if (screen === "dialogue") showDone();
+    if (screen === "reward" || screen === "dialogue") showDone();
   },
 };
 

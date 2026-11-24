@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { addDays, applyStreak, buildDaySession, gradeCard, quizChoices, sessionLength } from "./srsEngine.js";
+import { addDays, applyStreak, buildCheckpoint, buildDaySession, checkpointDue, gradeCard, quizChoices, sessionLength } from "./srsEngine.js";
 
 const today = "2026-11-24";
 
@@ -70,6 +70,16 @@ test("one missed day keeps the streak, two missed days reset it", () => {
   const next = applyStreak({ streak: 4, lastDone: "2026-11-23" }, today);
   assert.equal(next.streak, 5);
   assert.equal(next.usedJoker, false);
+});
+
+test("a checkpoint falls on every seventh lesson and reviews words already seen", () => {
+  assert.equal(checkpointDue({ sessionsDone: 6, lastDone: "2026-11-23", rewards: [] }, today), true);
+  assert.equal(checkpointDue({ sessionsDone: 5, lastDone: "2026-11-23", rewards: [] }, today), false);
+  assert.equal(checkpointDue({ sessionsDone: 7, lastDone: today, rewards: [1] }, today), false);
+  const session = buildCheckpoint({ wordCount: 20, seenIds: [0, 1, 2, 3, 4, 5, 6], seed: "fr-ru:check" });
+  assert.equal(session.checkpoint, true);
+  assert.equal(session.quiz.length, 5);
+  assert.ok(session.quiz.every((id) => id <= 6));
 });
 
 test("quiz choices include the right word once", () => {

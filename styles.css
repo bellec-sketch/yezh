@@ -526,6 +526,16 @@ button, input { font: inherit; }
   background: #e7f4ec;
 }
 
+.reward-thumb {
+  width: 96px;
+  height: 128px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 16px;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+}
+
 .dialogue .who-line {
   margin: 12px 0 2px;
   font-weight: 750;
