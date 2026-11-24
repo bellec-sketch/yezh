@@ -91,19 +91,129 @@ const frenchWords = [
   ["Числа", "Dix", "дис", "Десять"],
 ].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
 
+const russianGrammar = [
+  {
+    title: "Pas d'article",
+    rule: "Le russe ne dit pas « le », « la » ou « un ». Le mot seul suffit.",
+    examples: [
+      { say: "вода", target: "Вода", gloss: "de l'eau, l'eau" },
+      { say: "хлеб", target: "Хлеб", gloss: "du pain, le pain" },
+    ],
+  },
+  {
+    title: "Tu et vous",
+    rule: "Ты parle à un proche. Вы parle à plusieurs personnes, ou marque le respect.",
+    examples: [
+      { say: "привет", target: "Привет", gloss: "salut, avec ты" },
+      { say: "здравствуйте", target: "Здравствуйте", gloss: "bonjour, avec вы" },
+    ],
+  },
+  {
+    title: "La négation",
+    rule: "Не se place devant le mot qu'il nie.",
+    examples: [
+      { say: "я не знаю", target: "Я не знаю", gloss: "je ne sais pas" },
+      { say: "это не вода", target: "Это не вода", gloss: "ce n'est pas de l'eau" },
+    ],
+  },
+];
+
+const frenchGrammar = [
+  {
+    title: "Артикль",
+    rule: "Перед французским словом почти всегда стоит маленькое слово: le, la, un, une.",
+    examples: [
+      { say: "le pain", target: "Le pain", gloss: "хлеб" },
+      { say: "une pomme", target: "Une pomme", gloss: "яблоко" },
+    ],
+  },
+  {
+    title: "Глагол être",
+    rule: "По-французски «быть» не пропадает. Je suis значит «я есть».",
+    examples: [
+      { say: "je suis", target: "Je suis", gloss: "я" },
+      { say: "c'est de l'eau", target: "C'est de l'eau", gloss: "это вода" },
+    ],
+  },
+  {
+    title: "Отрицание",
+    rule: "Отрицание обнимает глагол: ne ... pas.",
+    examples: [
+      { say: "je ne sais pas", target: "Je ne sais pas", gloss: "я не знаю" },
+      { say: "ce n'est pas du pain", target: "Ce n'est pas du pain", gloss: "это не хлеб" },
+    ],
+  },
+];
+
+const bretonAlphabet = [
+  { upper: "C'H", lower: "c'h", name: "C'h", hint: "Un souffle au fond de la gorge, comme le j espagnol.", example: "c'hoant", exampleBack: "envie", speak: "c'hoant" },
+  { upper: "ZH", lower: "zh", name: "Zh", hint: "Souvent comme un z léger, parfois comme un ch.", example: "brezhoneg", exampleBack: "le breton", speak: "brezhoneg" },
+  { upper: "Ñ", lower: "ñ", name: "N tilde", hint: "Il nasalise le son d'avant.", example: "emañ", exampleBack: "est (quelque part)", speak: "emañ" },
+  { upper: "LH", lower: "lh", name: "Lh", hint: "Un l mouillé, proche du « ili ».", example: "familh", exampleBack: "famille", speak: "familh" },
+  { upper: "EU", lower: "eu", name: "Eu", hint: "Entre « é » et « eu » français.", example: "breur", exampleBack: "frère", speak: "breur" },
+  { upper: "OU", lower: "ou", name: "Ou", hint: "Comme le ou de « loup ».", example: "dour", exampleBack: "eau", speak: "dour" },
+];
+
+const bretonWords = [
+  ["Salutations", "Demat", "dématt", "Bonjour"],
+  ["Salutations", "Kenavo", "kénavo", "Au revoir"],
+  ["Salutations", "Nozvezh vat", "nozvèss vatt", "Bonne nuit"],
+  ["Salutations", "Mont a ra ?", "monn a ra", "Comment ça va ?"],
+  ["Mots utiles", "Trugarez", "trugarèz", "Merci"],
+  ["Mots utiles", "Mar plij", "mar pli", "S'il vous plaît"],
+  ["Mots utiles", "Ya", "ya", "Oui"],
+  ["Mots utiles", "Nann", "nann", "Non"],
+  ["Mots utiles", "Digarezit", "digarèzitt", "Excusez-moi"],
+  ["Mots utiles", "Brezhoneg", "brézoneg", "Le breton"],
+  ["Nourriture", "Dour", "dour", "Eau"],
+  ["Nourriture", "Bara", "bara", "Pain"],
+  ["Nourriture", "Laezh", "laèz", "Lait"],
+  ["Nourriture", "Aval", "aval", "Pomme"],
+  ["Nourriture", "Te", "té", "Thé"],
+  ["Nourriture", "Kafe", "kafé", "Café"],
+  ["Chiffres", "Unan", "ünan", "Un"],
+  ["Chiffres", "Daou", "daou", "Deux"],
+  ["Chiffres", "Tri", "tri", "Trois"],
+  ["Chiffres", "Dek", "dek", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const bretonGrammar = [
+  {
+    title: "L'article ar, al, an",
+    rule: "Le défini change selon le mot qui suit : ar bara, al laezh, an aval.",
+    examples: [
+      { say: "ar bara", target: "Ar bara", gloss: "le pain" },
+      { say: "an aval", target: "An aval", gloss: "la pomme" },
+    ],
+  },
+  {
+    title: "Un, une : ur, ul, un",
+    rule: "L'indéfini suit la même idée : ur bara, ul laezh, un aval.",
+    examples: [
+      { say: "ur bara", target: "Ur bara", gloss: "un pain" },
+      { say: "un aval", target: "Un aval", gloss: "une pomme" },
+    ],
+  },
+  {
+    title: "Ya et nann",
+    rule: "Ya veut dire oui. Nann veut dire non. Ils se placent en tête.",
+    examples: [
+      { say: "ya, trugarez", target: "Ya, trugarez", gloss: "oui, merci" },
+      { say: "nann, trugarez", target: "Nann, trugarez", gloss: "non, merci" },
+    ],
+  },
+];
+
 const courses = {
   "fr-ru": {
     id: "fr-ru",
     ui: "fr",
     voice: "ru-RU",
-    teacher: "Nina Sokolova",
-    role: "Professeure de russe",
-    portrait: "nina.jpg",
-    crop: "",
     title: "Russe",
     forWhom: "Si vous parlez français",
     lines: {
-      lobby: "Je m’appelle Nina. Une lettre, puis les mots qui doivent revenir.",
+      lobby: "Une lettre, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
       alphabet: "Écoutez la lettre, puis répétez-la tout bas.",
       vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
       speak: "Je le dis. Vous le reprenez.",
@@ -111,6 +221,11 @@ const courses = {
     },
     alphabet: russianAlphabet,
     words: russianWords,
+    grammar: russianGrammar,
+    teachers: [
+      { id: "nina", name: "Nina Sokolova", role: "Professeure de russe", portrait: "nina.jpg", hello: "Je m’appelle Nina. Une lettre, une règle, puis les mots qui reviennent." },
+      { id: "pavel", name: "Pavel Volkov", role: "Professeur de russe", portrait: "pavel.jpg", hello: "Je m’appelle Pavel. Une lettre, une règle, puis les mots qui reviennent." },
+    ],
     labels: {
       front: "Russe",
       back: "Français",
@@ -119,6 +234,8 @@ const courses = {
       listen: "Écouter",
       flip: "Retourner",
       nextLetter: "Lettre suivante",
+      toGrammar: "La grammaire",
+      grammarStep: "Grammaire",
       toWords: "Vers les mots",
       again: "À revoir",
       know: "Je le sais",
@@ -149,14 +266,11 @@ const courses = {
     id: "ru-fr",
     ui: "ru",
     voice: "fr-FR",
-    teacher: "Enora Le Gall",
-    role: "Преподаватель французского",
-    portrait: "enora.jpg",
-    crop: "left",
-    title: "Французский",
+    title: "Français",
     forWhom: "Если вы говорите по-русски",
     lines: {
-      lobby: "Меня зовут Энора. Одна буква, затем слова, которые нужно вернуть.",
+      lobby: "Одна буква, одно правило, затем слова, которые нужно вернуть.",
+      grammar: "Правило дня. Послушайте два примера.",
       alphabet: "Слушайте букву и повторите её тихо.",
       vocab: "Если слово ушло, нажмите «Повторить». Оно вернётся.",
       speak: "Я говорю. Вы повторяете.",
@@ -164,6 +278,11 @@ const courses = {
     },
     alphabet: frenchAlphabet,
     words: frenchWords,
+    grammar: frenchGrammar,
+    teachers: [
+      { id: "sophie", name: "Sophie Montaigne", role: "Professeure de français", portrait: "sophie.jpg", hello: "Меня зовут Софи Монтень. Одна буква, одно правило, затем слова." },
+      { id: "louis", name: "Louis Beaumont", role: "Professeur de français", portrait: "louis.jpg", hello: "Меня зовут Луи Бомон. Одна буква, одно правило, затем слова." },
+    ],
     labels: {
       front: "Французский",
       back: "Русский",
@@ -172,6 +291,8 @@ const courses = {
       listen: "Слушать",
       flip: "Перевернуть",
       nextLetter: "Следующая буква",
+      toGrammar: "Грамматика",
+      grammarStep: "Грамматика",
       toWords: "К словам",
       again: "Повторить",
       know: "Знаю",
@@ -203,13 +324,356 @@ const courses = {
       noVoice: "Голос здесь недоступен. Смотрите на запись произношения.",
     },
   },
+  "fr-br": {
+    id: "fr-br",
+    ui: "fr",
+    voice: "br",
+    title: "Breton",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Un son, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "Écoutez ce son, puis répétez-le tout bas.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: bretonAlphabet,
+    words: bretonWords,
+    grammar: bretonGrammar,
+    teachers: [
+      { id: "enora", name: "Enora Le Gall", role: "Professeure de breton", portrait: "enora.jpg", hello: "Je m’appelle Enora Le Gall. Un son du breton, une règle, puis des mots." },
+      { id: "yann", name: "Yann Madec", role: "Professeur de breton", portrait: "yann.jpg", hello: "Je m’appelle Yann Madec. Un son du breton, une règle, puis des mots." },
+    ],
+    labels: {
+      front: "Breton",
+      back: "Français",
+      start: "Commencer",
+      backHome: "Les langues",
+      listen: "Écouter",
+      flip: "Retourner",
+      nextLetter: "Son suivant",
+      toGrammar: "La grammaire",
+      grammarStep: "Grammaire",
+      toWords: "Vers les mots",
+      again: "À revoir",
+      know: "Je le sais",
+      toSpeak: "Vers la prononciation",
+      repeated: "J’ai répété",
+      finish: "Terminer",
+      doneHome: "Les langues",
+      review: "Révision",
+      fresh: "Nouveau",
+      session: "Séance du jour",
+      already: "Séance déjà faite aujourd’hui",
+      finished: "Séance terminée",
+      againTitle: "On peut recommencer",
+      ready: "Cinq minutes",
+      lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+      doneTitle: "À demain",
+      held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
+      streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
+      letterStep: (i, n) => `Son · ${i} sur ${n}`,
+      wordStep: (i, n) => `Mots · ${i} sur ${n}`,
+      speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
+      plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+      install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
+      noVoice: "La voix bretonne n’est pas toujours disponible. Suivez l’écriture.",
+    },
+  },
 };
 
-const soon = [
-  { title: "Japonais", note: "Bientôt" },
-  { title: "Chinois", note: "Bientôt" },
-  { title: "Arabe", note: "Bientôt" },
+const japaneseAlphabet = [
+  { upper: "あ", lower: "ア", name: "A", hint: "Comme le a de « papa ».", example: "あめ", exampleBack: "pluie", speak: "あ" },
+  { upper: "い", lower: "イ", name: "I", hint: "Comme le i de « lit ».", example: "いえ", exampleBack: "maison", speak: "い" },
+  { upper: "う", lower: "ウ", name: "Ou", hint: "Comme le ou de « loup ».", example: "うみ", exampleBack: "mer", speak: "う" },
+  { upper: "え", lower: "エ", name: "É", hint: "Comme le é de « été ».", example: "えき", exampleBack: "gare", speak: "え" },
+  { upper: "お", lower: "オ", name: "O", hint: "Comme le o de « or ».", example: "おちゃ", exampleBack: "thé", speak: "お" },
+  { upper: "か", lower: "カ", name: "Ka", hint: "K + a.", example: "かさ", exampleBack: "parapluie", speak: "か" },
+  { upper: "き", lower: "キ", name: "Ki", hint: "K + i.", example: "き", exampleBack: "arbre", speak: "き" },
+  { upper: "ん", lower: "ン", name: "N", hint: "Une consonne seule, en fin de syllabe.", example: "パン", exampleBack: "pain", speak: "パン" },
 ];
+
+const japaneseWords = [
+  ["Salutations", "こんにちは", "konnichiwa", "Bonjour"],
+  ["Salutations", "おはよう", "ohayou", "Bonjour (le matin)"],
+  ["Salutations", "さようなら", "sayounara", "Au revoir"],
+  ["Salutations", "元気ですか", "genki desu ka", "Comment ça va ?"],
+  ["Mots utiles", "ありがとう", "arigatou", "Merci"],
+  ["Mots utiles", "お願いします", "onegaishimasu", "S'il vous plaît"],
+  ["Mots utiles", "はい", "hai", "Oui"],
+  ["Mots utiles", "いいえ", "iie", "Non"],
+  ["Mots utiles", "すみません", "sumimasen", "Excusez-moi"],
+  ["Nourriture", "水", "mizu", "Eau"],
+  ["Nourriture", "パン", "pan", "Pain"],
+  ["Nourriture", "牛乳", "gyuunyuu", "Lait"],
+  ["Nourriture", "りんご", "ringo", "Pomme"],
+  ["Nourriture", "お茶", "ocha", "Thé"],
+  ["Nourriture", "コーヒー", "koohii", "Café"],
+  ["Chiffres", "一", "ichi", "Un"],
+  ["Chiffres", "二", "ni", "Deux"],
+  ["Chiffres", "三", "san", "Trois"],
+  ["Chiffres", "十", "juu", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const japaneseGrammar = [
+  {
+    title: "La particule は",
+    rule: "は marque le thème de la phrase. Dans ce rôle, on la lit « wa », pas « ha ».",
+    examples: [
+      { say: "みずは みずです", target: "水は水です", gloss: "l'eau, c'est de l'eau" },
+      { say: "これは パンです", target: "これはパンです", gloss: "ceci est du pain" },
+    ],
+  },
+  {
+    title: "です",
+    rule: "です ferme une phrase polie. Il veut souvent dire « c'est ».",
+    examples: [
+      { say: "これは みずです", target: "これは水です", gloss: "c'est de l'eau" },
+      { say: "りんごです", target: "りんごです", gloss: "c'est une pomme" },
+    ],
+  },
+  {
+    title: "La question か",
+    rule: "か à la fin transforme la phrase en question.",
+    examples: [
+      { say: "みずですか", target: "水ですか", gloss: "c'est de l'eau ?" },
+      { say: "げんきですか", target: "元気ですか", gloss: "comment ça va ?" },
+    ],
+  },
+];
+
+const chineseAlphabet = [
+  { upper: "mā", lower: "妈", name: "1er ton", hint: "La voix reste haute et plate.", example: "妈", exampleBack: "maman", speak: "妈" },
+  { upper: "má", lower: "麻", name: "2e ton", hint: "La voix monte, comme une question.", example: "麻", exampleBack: "chanvre", speak: "麻" },
+  { upper: "mǎ", lower: "马", name: "3e ton", hint: "La voix descend, puis remonte.", example: "马", exampleBack: "cheval", speak: "马" },
+  { upper: "mà", lower: "骂", name: "4e ton", hint: "La voix tombe, nette.", example: "骂", exampleBack: "gronder", speak: "骂" },
+  { upper: "zh", lower: "知", name: "Zh", hint: "La langue se relève, comme « dj ».", example: "知道", exampleBack: "savoir", speak: "知道" },
+  { upper: "x", lower: "西", name: "X", hint: "Un s très léger, la langue vers les dents.", example: "西", exampleBack: "ouest", speak: "西" },
+];
+
+const chineseWords = [
+  ["Salutations", "你好", "nǐ hǎo", "Bonjour"],
+  ["Salutations", "早上好", "zǎoshang hǎo", "Bonjour (le matin)"],
+  ["Salutations", "再见", "zàijiàn", "Au revoir"],
+  ["Salutations", "你好吗", "nǐ hǎo ma", "Comment ça va ?"],
+  ["Mots utiles", "谢谢", "xièxie", "Merci"],
+  ["Mots utiles", "请", "qǐng", "S'il vous plaît"],
+  ["Mots utiles", "对", "duì", "Oui"],
+  ["Mots utiles", "不", "bù", "Non"],
+  ["Mots utiles", "不好意思", "bù hǎoyìsi", "Excusez-moi"],
+  ["Nourriture", "水", "shuǐ", "Eau"],
+  ["Nourriture", "面包", "miànbāo", "Pain"],
+  ["Nourriture", "牛奶", "niúnǎi", "Lait"],
+  ["Nourriture", "苹果", "píngguǒ", "Pomme"],
+  ["Nourriture", "茶", "chá", "Thé"],
+  ["Nourriture", "咖啡", "kāfēi", "Café"],
+  ["Chiffres", "一", "yī", "Un"],
+  ["Chiffres", "二", "èr", "Deux"],
+  ["Chiffres", "三", "sān", "Trois"],
+  ["Chiffres", "十", "shí", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const chineseGrammar = [
+  {
+    title: "是",
+    rule: "Pas d'article, peu de conjugaison. 是 veut dire « être », « c'est ».",
+    examples: [
+      { say: "这是水", target: "这是水", gloss: "c'est de l'eau" },
+      { say: "我是学生", target: "我是学生", gloss: "je suis étudiant" },
+    ],
+  },
+  {
+    title: "吗",
+    rule: "吗 à la fin pose une question oui ou non.",
+    examples: [
+      { say: "你好吗", target: "你好吗", gloss: "comment ça va ?" },
+      { say: "这是水吗", target: "这是水吗", gloss: "c'est de l'eau ?" },
+    ],
+  },
+  {
+    title: "不",
+    rule: "不 se place devant le verbe pour dire non.",
+    examples: [
+      { say: "我不是", target: "我不是", gloss: "je ne suis pas" },
+      { say: "这不是面包", target: "这不是面包", gloss: "ce n'est pas du pain" },
+    ],
+  },
+];
+
+const arabicAlphabet = [
+  { upper: "ا", lower: "a", name: "Alif", hint: "Porte le a, ou allonge la voyelle.", example: "أب", exampleBack: "père", speak: "أب" },
+  { upper: "ب", lower: "b", name: "Ba", hint: "Comme le b de « beau ». Un point en dessous.", example: "باب", exampleBack: "porte", speak: "باب" },
+  { upper: "ت", lower: "t", name: "Ta", hint: "Comme le t. Deux points au-dessus.", example: "توت", exampleBack: "mûre", speak: "توت" },
+  { upper: "ج", lower: "j", name: "Jim", hint: "Comme le j de « jour ». Un point en dessous.", example: "جميل", exampleBack: "beau", speak: "جميل" },
+  { upper: "ح", lower: "h", hint: "Un h soufflé, du fond de la gorge.", name: "Ha", example: "حليب", exampleBack: "lait", speak: "حليب" },
+  { upper: "د", lower: "d", name: "Dal", hint: "Comme le d de « dos ».", example: "دار", exampleBack: "maison", speak: "دار" },
+  { upper: "ر", lower: "r", name: "Ra", hint: "Un r roulé.", example: "رز", exampleBack: "riz", speak: "رز" },
+  { upper: "م", lower: "m", name: "Mim", hint: "Comme le m de « mer ».", example: "ماء", exampleBack: "eau", speak: "ماء" },
+];
+
+const arabicWords = [
+  ["Salutations", "مرحبا", "marhaban", "Bonjour"],
+  ["Salutations", "السلام عليكم", "salam alaykoum", "Bonjour (formel)"],
+  ["Salutations", "صباح الخير", "sabah al-khayr", "Bonjour (le matin)"],
+  ["Salutations", "مع السلامة", "ma'a s-salama", "Au revoir"],
+  ["Salutations", "كيف الحال", "kayfa al-hal", "Comment ça va ?"],
+  ["Mots utiles", "شكرا", "shoukran", "Merci"],
+  ["Mots utiles", "من فضلك", "min fadlik", "S'il vous plaît"],
+  ["Mots utiles", "نعم", "na'am", "Oui"],
+  ["Mots utiles", "لا", "la", "Non"],
+  ["Mots utiles", "عفوا", "afwan", "Excusez-moi"],
+  ["Nourriture", "ماء", "ma'", "Eau"],
+  ["Nourriture", "خبز", "khoubz", "Pain"],
+  ["Nourriture", "حليب", "halib", "Lait"],
+  ["Nourriture", "تفاحة", "touffaha", "Pomme"],
+  ["Nourriture", "شاي", "shay", "Thé"],
+  ["Nourriture", "قهوة", "qahwa", "Café"],
+  ["Chiffres", "واحد", "wahid", "Un"],
+  ["Chiffres", "اثنان", "ithnan", "Deux"],
+  ["Chiffres", "ثلاثة", "thalatha", "Trois"],
+  ["Chiffres", "عشرة", "ashara", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const arabicGrammar = [
+  {
+    title: "L'article ال",
+    rule: "ال se colle devant le nom pour dire « le » ou « la ». الماء, c'est l'eau.",
+    examples: [
+      { say: "الماء", target: "الماء", gloss: "l'eau" },
+      { say: "الخبز", target: "الخبز", gloss: "le pain" },
+    ],
+  },
+  {
+    title: "Pas de verbe être",
+    rule: "Au présent, on ne dit pas « être ». أنا veut dire je. هذا ماء : ceci est de l'eau.",
+    examples: [
+      { say: "أنا", target: "أنا", gloss: "je" },
+      { say: "هذا ماء", target: "هذا ماء", gloss: "ceci est de l'eau" },
+    ],
+  },
+  {
+    title: "هل",
+    rule: "هل en tête de phrase pose une question oui ou non.",
+    examples: [
+      { say: "هل هذا ماء", target: "هل هذا ماء؟", gloss: "est-ce de l'eau ?" },
+      { say: "هل أنت بخير", target: "هل أنت بخير؟", gloss: "est-ce que ça va ?" },
+    ],
+  },
+];
+
+function courseInFrench(front) {
+  return {
+    front,
+    back: "Français",
+    start: "Commencer",
+    backHome: "Les langues",
+    listen: "Écouter",
+    flip: "Retourner",
+    nextLetter: "Son suivant",
+    toGrammar: "La grammaire",
+    grammarStep: "Grammaire",
+    toWords: "Vers les mots",
+    again: "À revoir",
+    know: "Je le sais",
+    toSpeak: "Vers la prononciation",
+    repeated: "J’ai répété",
+    finish: "Terminer",
+    doneHome: "Les langues",
+    review: "Révision",
+    fresh: "Nouveau",
+    session: "Séance du jour",
+    already: "Séance déjà faite aujourd’hui",
+    finished: "Séance terminée",
+    againTitle: "On peut recommencer",
+    ready: "Cinq minutes",
+    lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+    doneTitle: "À demain",
+    held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
+    streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
+    letterStep: (i, n) => `Son · ${i} sur ${n}`,
+    wordStep: (i, n) => `Mots · ${i} sur ${n}`,
+    speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
+    plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+    install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
+    noVoice: "La voix n’est pas disponible ici. Suivez l’écriture.",
+  };
+}
+
+Object.assign(courses, {
+  "fr-ja": {
+    id: "fr-ja",
+    ui: "fr",
+    voice: "ja-JP",
+    title: "Japonais",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Un son, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "Écoutez ce son, puis répétez-le tout bas.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: japaneseAlphabet,
+    words: japaneseWords,
+    grammar: japaneseGrammar,
+    teachers: [
+      { id: "hana", name: "Hana Mori", role: "Professeure de japonais", portrait: "hana.jpg", hello: "Je m’appelle Hana Mori. Un son, une règle, puis des mots." },
+      { id: "haruto", name: "Haruto Sato", role: "Professeur de japonais", portrait: "haruto.jpg", hello: "Je m’appelle Haruto Sato. Un son, une règle, puis des mots." },
+    ],
+    labels: courseInFrench("Japonais"),
+  },
+  "fr-zh": {
+    id: "fr-zh",
+    ui: "fr",
+    voice: "zh-CN",
+    title: "Chinois",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Un ton, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "Écoutez ce ton, puis répétez-le tout bas.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: chineseAlphabet,
+    words: chineseWords,
+    grammar: chineseGrammar,
+    teachers: [
+      { id: "mei", name: "Mei Lin", role: "Professeure de chinois", portrait: "mei.jpg", hello: "Je m’appelle Mei Lin. Un ton, une règle, puis des mots." },
+      { id: "chen", name: "Wei Chen", role: "Professeur de chinois", portrait: "chen.jpg", hello: "Je m’appelle Wei Chen. Un ton, une règle, puis des mots." },
+    ],
+    labels: courseInFrench("Chinois"),
+  },
+  "fr-ar": {
+    id: "fr-ar",
+    ui: "fr",
+    voice: "ar",
+    dir: "rtl",
+    title: "Arabe",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Une lettre, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "L’arabe se lit de droite à gauche. Écoutez la lettre.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: arabicAlphabet,
+    words: arabicWords,
+    grammar: arabicGrammar,
+    teachers: [
+      { id: "layla", name: "Layla Haddad", role: "Professeure d’arabe", portrait: "layla.jpg", hello: "Je m’appelle Layla Haddad. Une lettre, une règle, puis des mots." },
+      { id: "karim", name: "Karim Nassar", role: "Professeur d’arabe", portrait: "karim.jpg", hello: "Je m’appelle Karim Nassar. Une lettre, une règle, puis des mots." },
+    ],
+    labels: courseInFrench("Arabe"),
+  },
+});
+
+const soon = [];
 
 const stage = document.getElementById("stage");
 const actions = document.getElementById("actions");
@@ -223,6 +687,7 @@ const roleEl = document.getElementById("role");
 const brandSub = document.getElementById("brand-sub");
 
 let course = null;
+let teacher = null;
 let screen = "pick";
 let cursor = 0;
 let session = null;
@@ -280,6 +745,7 @@ function buildSession(progress) {
     newIds,
     letterIndex,
     letterIsNew,
+    grammarIndex: Math.floor(Date.now() / 86400000) % course.grammar.length,
     speaks: wordIds.slice(0, 3),
   };
 }
@@ -297,6 +763,11 @@ function speak(text) {
   if (voice) utterance.voice = voice;
   speechSynthesis.cancel();
   speechSynthesis.speak(utterance);
+}
+
+function scriptAttrs() {
+  const dir = course.dir === "rtl" ? ' dir="rtl"' : "";
+  return `lang="${course.voice.slice(0, 2)}"${dir}`;
 }
 
 function formatClock(totalSeconds) {
@@ -333,11 +804,13 @@ function setActions(buttons) {
 }
 
 function showTeacher(line) {
+  document.querySelector(".app").classList.add("in-lesson");
+  document.getElementById("figure-wrap").hidden = false;
   coachEl.hidden = false;
-  portraitEl.src = course.portrait;
-  portraitEl.classList.toggle("left", course.crop === "left");
-  whoEl.textContent = course.teacher;
-  roleEl.textContent = course.role;
+  portraitEl.src = teacher.portrait;
+  portraitEl.alt = teacher.name;
+  whoEl.textContent = teacher.name;
+  roleEl.textContent = teacher.role;
   lineEl.textContent = line;
   brandSub.textContent = course.title;
   document.documentElement.lang = course.ui;
@@ -357,17 +830,28 @@ function openCourse() {
 
 function showPick() {
   course = null;
+  teacher = null;
   screen = "pick";
+  document.querySelector(".app").classList.remove("in-lesson");
+  document.getElementById("figure-wrap").hidden = true;
   coachEl.hidden = true;
   clockEl.hidden = true;
   stepEl.textContent = "";
   brandSub.textContent = "langue, en breton";
   document.documentElement.lang = "fr";
-  const cards = Object.values(courses).map((item) => `
-    <button class="course" type="button" data-course="${item.id}">
-      <img class="${item.crop}" src="${item.portrait}" alt="">
-      <span><strong>${item.teacher}</strong><span>${item.title} · ${item.forWhom}</span></span>
-    </button>
+  const blocks = Object.values(courses).map((item) => `
+    <article class="lang-block">
+      <h2>${item.title}</h2>
+      <p>${item.forWhom}</p>
+      <div class="pair">
+        ${item.teachers.map((person) => `
+          <button type="button" data-course="${item.id}" data-teacher="${person.id}">
+            <img src="${person.portrait}" alt="">
+            <strong>${person.name}</strong>
+          </button>
+        `).join("")}
+      </div>
+    </article>
   `).join("");
   const later = soon.map((item) => `
     <button class="course soon" type="button" disabled>
@@ -377,10 +861,10 @@ function showPick() {
   `).join("");
   stage.innerHTML = `
     <article class="panel">
-      <h2>Cinq minutes, dans les deux sens</h2>
-      <p>Un personnage vous guide. Le russe pour le français, le français pour le russe. Les mots reviennent les jours suivants.</p>
+      <h2>Choisissez qui vous guide</h2>
+      <p>Une fille ou un garçon, pour cinq minutes. Russe, français, breton, japonais, chinois et arabe. Les mots reviennent les jours suivants.</p>
     </article>
-    <div class="courses">${cards}${later}</div>
+    <div class="courses">${blocks}${later}</div>
   `;
   setActions([]);
 }
@@ -391,7 +875,7 @@ function showLobby() {
   const plan = progress.savedDay === todayKey() && progress.savedSession ? progress.savedSession : buildSession(progress);
   const reviews = plan.wordIds.length - plan.newIds.length;
   const doneToday = progress.lastDone === todayKey();
-  showTeacher(course.lines.lobby);
+  showTeacher(teacher.hello);
   stepEl.textContent = doneToday ? course.labels.already : course.labels.session;
   clockEl.hidden = false;
   clockEl.textContent = "5 min";
@@ -419,14 +903,33 @@ function showAlphabet() {
   stage.innerHTML = `
     <article class="panel">
       <p class="mark">${letter.name}</p>
-      <p class="letter" lang="${course.voice.slice(0, 2)}">${letter.upper} ${letter.lower}</p>
+      <p class="letter" ${scriptAttrs()}>${letter.upper} ${letter.lower}</p>
       <p class="hint">${letter.hint}</p>
       <p class="example">${letter.example} · ${letter.exampleBack}</p>
     </article>
   `;
   setActions([
     { label: course.labels.listen, action: "listen", primary: true },
-    { label: session.wordIds.length ? course.labels.toWords : course.labels.finish, action: "next" },
+    { label: course.labels.toGrammar, action: "next" },
+  ]);
+}
+
+function showGrammar() {
+  screen = "grammar";
+  const item = course.grammar[(session.grammarIndex || 0) % course.grammar.length];
+  showTeacher(course.lines.grammar);
+  stepEl.textContent = course.labels.grammarStep;
+  stage.innerHTML = `
+    <article class="panel">
+      <p class="mark">${item.title}</p>
+      <p class="rule">${item.rule}</p>
+      <div class="examples">
+        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong ${scriptAttrs()}>${example.target}</strong><span>${example.gloss}</span></button>`).join("")}
+      </div>
+    </article>
+  `;
+  setActions([
+    { label: course.labels.toWords, action: "next", primary: true, wide: true },
   ]);
 }
 
@@ -442,7 +945,7 @@ function showVocab() {
       <span class="card-inner">
         <span class="face face-front">
           <span class="tag">${isNew ? course.labels.fresh : course.labels.review}</span>
-          <span class="word" lang="${course.voice.slice(0, 2)}">${word.front}</span>
+          <span class="word" ${scriptAttrs()}>${word.front}</span>
           <span class="phonetic">${word.phonetic}</span>
           <span class="face-label">${course.labels.front}</span>
         </span>
@@ -471,7 +974,7 @@ function showSpeak() {
   stage.innerHTML = `
     <article class="panel">
       <p class="mark">${word.back}</p>
-      <p class="word" lang="${course.voice.slice(0, 2)}">${word.front}</p>
+      <p class="word" ${scriptAttrs()}>${word.front}</p>
       <p class="phonetic">${word.phonetic}</p>
     </article>
   `;
@@ -539,6 +1042,7 @@ function flipCard() {
 }
 
 function currentSpeakText() {
+  if (screen === "grammar") return course.grammar[(session.grammarIndex || 0) % course.grammar.length].examples[0].say;
   if (screen === "alphabet") return course.alphabet[session.letterIndex].speak;
   if (screen === "vocab") return course.words[session.wordIds[cursor]].speak;
   if (screen === "speak") return course.words[session.speaks[cursor]].speak;
@@ -566,6 +1070,11 @@ const handlers = {
   next() {
     if (screen === "alphabet") {
       cursor = 0;
+      showGrammar();
+      return;
+    }
+    if (screen === "grammar") {
+      cursor = 0;
       if (session.wordIds.length) showVocab();
       else showDone();
       return;
@@ -586,9 +1095,15 @@ actions.addEventListener("click", (event) => {
 });
 
 stage.addEventListener("click", (event) => {
-  const choice = event.target.closest("[data-course]");
+  const said = event.target.closest("[data-say]");
+  if (said) {
+    speak(said.dataset.say);
+    return;
+  }
+  const choice = event.target.closest("[data-teacher]");
   if (choice) {
     course = courses[choice.dataset.course];
+    teacher = course.teachers.find((person) => person.id === choice.dataset.teacher);
     showLobby();
     return;
   }

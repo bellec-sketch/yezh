@@ -31,9 +31,50 @@ button, input { font: inherit; }
   display: flex;
   flex-direction: column;
   padding:
-    max(16px, env(safe-area-inset-top))
-    18px
-    max(16px, env(safe-area-inset-bottom));
+    max(12px, env(safe-area-inset-top))
+    14px
+    max(12px, env(safe-area-inset-bottom));
+}
+
+.scene {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lesson-col {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-wrap {
+  height: min(42dvh, 460px);
+  border-radius: 28px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(31, 75, 110, 0.12), transparent 40%),
+    #f7f1e6;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.figure-wrap[hidden] { display: none; }
+
+.figure {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.app.in-lesson {
+  width: min(1040px, 100%);
 }
 
 .top {
@@ -149,6 +190,39 @@ button, input { font: inherit; }
 
 .course.soon { opacity: 0.62; cursor: default; box-shadow: none; }
 
+.lang-block {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.lang-block h2 { margin: 0; font-size: 1.2rem; }
+
+.lang-block > p { margin: 2px 0 10px; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.pair button {
+  border: 0;
+  background: #f7f1e6;
+  border-radius: 18px;
+  padding: 8px 8px 10px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.pair img {
+  width: 100%;
+  height: 168px;
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+}
+
+.pair strong { display: block; margin-top: 4px; font-size: 0.92rem; }
+
 .mark {
   display: inline-block;
   margin-bottom: 6px;
@@ -171,10 +245,22 @@ button, input { font: inherit; }
 
 .stage {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 12px;
+}
+
+.app.in-lesson .stage { justify-content: stretch; }
+
+.app.in-lesson .panel,
+.app.in-lesson .card,
+.app.in-lesson .card-inner,
+.app.in-lesson .face {
+  flex: 1;
+  min-height: 220px;
+  height: 100%;
 }
 
 .panel {
@@ -345,6 +431,66 @@ button, input { font: inherit; }
   font-weight: 750;
 }
 
-@media (min-width: 720px) {
-  .app { padding-top: 36px; }
+.rule {
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.examples {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.example-btn, .choice {
+  width: 100%;
+  text-align: left;
+  border-radius: 16px;
+  border: 2px solid #c9d5df;
+  background: #fff;
+  min-height: 56px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.example-btn strong, .choice { font-weight: 750; }
+
+.example-btn span {
+  display: block;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+
+.choice.bad {
+  border-color: #a85b58;
+  background: #fdeeee;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+@media (min-width: 860px) {
+  .app.in-lesson .scene {
+    display: grid;
+    grid-template-columns: minmax(240px, 34%) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    flex: 1;
+  }
+
+  .app.in-lesson .figure-wrap {
+    height: auto;
+    min-height: 100%;
+  }
+
+  .app.in-lesson .lesson-col { height: 100%; }
 }

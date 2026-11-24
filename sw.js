@@ -1,4 +1,4 @@
-const CACHE = "yezh-v1";
+const CACHE = "yezh-v4";
 const FILES = [
   "./",
   "./index.html",
@@ -8,7 +8,17 @@ const FILES = [
   "./icon-192.png",
   "./icon-512.png",
   "./nina.jpg",
+  "./pavel.jpg",
+  "./sophie.jpg",
+  "./louis.jpg",
   "./enora.jpg",
+  "./yann.jpg",
+  "./hana.jpg",
+  "./haruto.jpg",
+  "./mei.jpg",
+  "./chen.jpg",
+  "./layla.jpg",
+  "./karim.jpg",
 ];
 
 self.addEventListener("install", (event) => {

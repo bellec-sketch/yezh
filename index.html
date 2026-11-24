@@ -23,18 +23,23 @@
       <p class="clock" id="clock" hidden>5 min</p>
     </header>
 
-    <section class="coach" id="coach" hidden>
-      <img class="portrait" id="portrait" alt="">
-      <div class="coach-copy">
-        <p class="who" id="who"></p>
-        <p class="role" id="role"></p>
-        <p class="line" id="line"></p>
+    <div class="scene" id="scene">
+      <div class="figure-wrap" id="figure-wrap" hidden>
+        <img class="figure" id="portrait" alt="">
       </div>
-    </section>
-
-    <p class="step" id="step" aria-live="polite"></p>
-    <section class="stage" id="stage"></section>
-    <div class="actions" id="actions"></div>
+      <div class="lesson-col">
+        <section class="coach" id="coach" hidden>
+          <div class="coach-copy">
+            <p class="who" id="who"></p>
+            <p class="role" id="role"></p>
+            <p class="line" id="line"></p>
+          </div>
+        </section>
+        <p class="step" id="step" aria-live="polite"></p>
+        <section class="stage" id="stage"></section>
+        <div class="actions" id="actions"></div>
+      </div>
+    </div>
   </main>
   <script src="app.js"></script>
 </body>
