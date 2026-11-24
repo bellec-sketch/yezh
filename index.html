@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f4b6e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Yezh">
+  <title>Yezh</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div>
+        <p class="brand">Yezh</p>
+        <p class="brand-sub" id="brand-sub">langue, en breton</p>
+      </div>
+      <p class="clock" id="clock" hidden>5 min</p>
+    </header>
+
+    <section class="coach" id="coach" hidden>
+      <img class="portrait" id="portrait" alt="">
+      <div class="coach-copy">
+        <p class="who" id="who"></p>
+        <p class="role" id="role"></p>
+        <p class="line" id="line"></p>
+      </div>
+    </section>
+
+    <p class="step" id="step" aria-live="polite"></p>
+    <section class="stage" id="stage"></section>
+    <div class="actions" id="actions"></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
