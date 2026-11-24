@@ -395,50 +395,57 @@ const japaneseAlphabet = [
 ];
 
 const japaneseWords = [
-  ["Salutations", "こんにちは", "konnichiwa", "Bonjour"],
-  ["Salutations", "おはよう", "ohayou", "Bonjour (le matin)"],
-  ["Salutations", "さようなら", "sayounara", "Au revoir"],
-  ["Salutations", "元気ですか", "genki desu ka", "Comment ça va ?"],
-  ["Mots utiles", "ありがとう", "arigatou", "Merci"],
-  ["Mots utiles", "お願いします", "onegaishimasu", "S'il vous plaît"],
-  ["Mots utiles", "はい", "hai", "Oui"],
-  ["Mots utiles", "いいえ", "iie", "Non"],
-  ["Mots utiles", "すみません", "sumimasen", "Excusez-moi"],
-  ["Nourriture", "水", "mizu", "Eau"],
-  ["Nourriture", "パン", "pan", "Pain"],
-  ["Nourriture", "牛乳", "gyuunyuu", "Lait"],
-  ["Nourriture", "りんご", "ringo", "Pomme"],
-  ["Nourriture", "お茶", "ocha", "Thé"],
-  ["Nourriture", "コーヒー", "koohii", "Café"],
-  ["Chiffres", "一", "ichi", "Un"],
-  ["Chiffres", "二", "ni", "Deux"],
-  ["Chiffres", "三", "san", "Trois"],
-  ["Chiffres", "十", "juu", "Dix"],
-].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+  ["Salutations", "こんにちは", "konnichiwa", "Bonjour", [["こ", "ko", "ko"], ["ん", "n", "n"], ["に", "ni", "ni"], ["ち", "chi", "chi"], ["は", "wa", "wa"]]],
+  ["Salutations", "おはよう", "ohayou", "Bonjour (le matin)", [["お", "o", "o"], ["は", "ha", "ha"], ["よ", "yo", "yo"], ["う", "u", "ou"]]],
+  ["Salutations", "さようなら", "sayounara", "Au revoir", [["さ", "sa", "sa"], ["よ", "yo", "yo"], ["う", "u", "ou"], ["な", "na", "na"], ["ら", "ra", "ra"]]],
+  ["Salutations", "元気ですか", "genki desu ka", "Comment ça va ?", [["元", "gen", "origine"], ["気", "ki", "souffle"], ["で", "de", "de"], ["す", "su", "su"], ["か", "ka", "question"]]],
+  ["Mots utiles", "ありがとう", "arigatou", "Merci", [["あ", "a", "a"], ["り", "ri", "ri"], ["が", "ga", "ga"], ["と", "to", "to"], ["う", "u", "ou"]]],
+  ["Mots utiles", "お願いします", "onegaishimasu", "S'il vous plaît", [["お", "o", "politesse"], ["願", "gan", "souhait"], ["い", "i", "i"], ["し", "shi", "shi"], ["ま", "ma", "ma"], ["す", "su", "su"]]],
+  ["Mots utiles", "はい", "hai", "Oui", [["は", "ha", "ha"], ["い", "i", "i"]]],
+  ["Mots utiles", "いいえ", "iie", "Non", [["い", "i", "i"], ["い", "i", "i"], ["え", "e", "é"]]],
+  ["Mots utiles", "すみません", "sumimasen", "Excusez-moi", [["す", "su", "su"], ["み", "mi", "mi"], ["ま", "ma", "ma"], ["せ", "se", "sé"], ["ん", "n", "n"]]],
+  ["Nourriture", "水", "mizu", "Eau", [["水", "mizu", "eau"]]],
+  ["Nourriture", "パン", "pan", "Pain", [["パ", "pa", "pa"], ["ン", "n", "n"]]],
+  ["Nourriture", "牛乳", "gyuunyuu", "Lait", [["牛", "gyū", "vache"], ["乳", "nyū", "lait"]]],
+  ["Nourriture", "りんご", "ringo", "Pomme", [["り", "ri", "ri"], ["ん", "n", "n"], ["ご", "go", "go"]]],
+  ["Nourriture", "お茶", "ocha", "Thé", [["お", "o", "politesse"], ["茶", "cha", "thé"]]],
+  ["Nourriture", "コーヒー", "koohii", "Café", [["コ", "ko", "ko"], ["ー", "—", "son long"], ["ヒ", "hi", "hi"], ["ー", "—", "son long"]]],
+  ["Chiffres", "一", "ichi", "Un", [["一", "ichi", "un"]]],
+  ["Chiffres", "二", "ni", "Deux", [["二", "ni", "deux"]]],
+  ["Chiffres", "三", "san", "Trois", [["三", "san", "trois"]]],
+  ["Chiffres", "十", "juu", "Dix", [["十", "jū", "dix"]]],
+].map(([category, front, phonetic, back, glyphs]) => ({
+  category,
+  front,
+  phonetic,
+  back,
+  speak: front,
+  glyphs: glyphs.map(([c, p, m]) => ({ c, p, m })),
+}));
 
 const japaneseGrammar = [
   {
     title: "La particule は",
     rule: "は marque le thème de la phrase. Dans ce rôle, on la lit « wa », pas « ha ».",
     examples: [
-      { say: "みずは みずです", target: "水は水です", gloss: "l'eau, c'est de l'eau" },
-      { say: "これは パンです", target: "これはパンです", gloss: "ceci est du pain" },
+      { say: "みずは みずです", target: "水は水です", gloss: "l'eau, c'est de l'eau", glyphs: [["水", "mizu", "eau"], ["は", "wa", "thème"], ["水", "mizu", "eau"], ["で", "de", "de"], ["す", "su", "su"]] },
+      { say: "これは パンです", target: "これはパンです", gloss: "ceci est du pain", glyphs: [["こ", "ko", "ko"], ["れ", "re", "re"], ["は", "wa", "thème"], ["パ", "pa", "pa"], ["ン", "n", "n"], ["で", "de", "de"], ["す", "su", "su"]] },
     ],
   },
   {
     title: "です",
     rule: "です ferme une phrase polie. Il veut souvent dire « c'est ».",
     examples: [
-      { say: "これは みずです", target: "これは水です", gloss: "c'est de l'eau" },
-      { say: "りんごです", target: "りんごです", gloss: "c'est une pomme" },
+      { say: "これは みずです", target: "これは水です", gloss: "c'est de l'eau", glyphs: [["こ", "ko", "ko"], ["れ", "re", "re"], ["は", "wa", "thème"], ["水", "mizu", "eau"], ["で", "de", "de"], ["す", "su", "su"]] },
+      { say: "りんごです", target: "りんごです", gloss: "c'est une pomme", glyphs: [["り", "ri", "ri"], ["ん", "n", "n"], ["ご", "go", "go"], ["で", "de", "de"], ["す", "su", "su"]] },
     ],
   },
   {
     title: "La question か",
     rule: "か à la fin transforme la phrase en question.",
     examples: [
-      { say: "みずですか", target: "水ですか", gloss: "c'est de l'eau ?" },
-      { say: "げんきですか", target: "元気ですか", gloss: "comment ça va ?" },
+      { say: "みずですか", target: "水ですか", gloss: "c'est de l'eau ?", glyphs: [["水", "mizu", "eau"], ["で", "de", "de"], ["す", "su", "su"], ["か", "ka", "question"]] },
+      { say: "げんきですか", target: "元気ですか", gloss: "comment ça va ?", glyphs: [["元", "gen", "origine"], ["気", "ki", "souffle"], ["で", "de", "de"], ["す", "su", "su"], ["か", "ka", "question"]] },
     ],
   },
 ];
@@ -453,50 +460,57 @@ const chineseAlphabet = [
 ];
 
 const chineseWords = [
-  ["Salutations", "你好", "nǐ hǎo", "Bonjour"],
-  ["Salutations", "早上好", "zǎoshang hǎo", "Bonjour (le matin)"],
-  ["Salutations", "再见", "zàijiàn", "Au revoir"],
-  ["Salutations", "你好吗", "nǐ hǎo ma", "Comment ça va ?"],
-  ["Mots utiles", "谢谢", "xièxie", "Merci"],
-  ["Mots utiles", "请", "qǐng", "S'il vous plaît"],
-  ["Mots utiles", "对", "duì", "Oui"],
-  ["Mots utiles", "不", "bù", "Non"],
-  ["Mots utiles", "不好意思", "bù hǎoyìsi", "Excusez-moi"],
-  ["Nourriture", "水", "shuǐ", "Eau"],
-  ["Nourriture", "面包", "miànbāo", "Pain"],
-  ["Nourriture", "牛奶", "niúnǎi", "Lait"],
-  ["Nourriture", "苹果", "píngguǒ", "Pomme"],
-  ["Nourriture", "茶", "chá", "Thé"],
-  ["Nourriture", "咖啡", "kāfēi", "Café"],
-  ["Chiffres", "一", "yī", "Un"],
-  ["Chiffres", "二", "èr", "Deux"],
-  ["Chiffres", "三", "sān", "Trois"],
-  ["Chiffres", "十", "shí", "Dix"],
-].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+  ["Salutations", "你好", "nǐ hǎo", "Bonjour", [["你", "nǐ", "tu"], ["好", "hǎo", "bon"]]],
+  ["Salutations", "早上好", "zǎoshang hǎo", "Bonjour (le matin)", [["早", "zǎo", "tôt"], ["上", "shàng", "dessus"], ["好", "hǎo", "bon"]]],
+  ["Salutations", "再见", "zàijiàn", "Au revoir", [["再", "zài", "encore"], ["见", "jiàn", "voir"]]],
+  ["Salutations", "你好吗", "nǐ hǎo ma", "Comment ça va ?", [["你", "nǐ", "tu"], ["好", "hǎo", "bon"], ["吗", "ma", "est-ce que"]]],
+  ["Mots utiles", "谢谢", "xièxie", "Merci", [["谢", "xiè", "remercier"], ["谢", "xiè", "remercier"]]],
+  ["Mots utiles", "请", "qǐng", "S'il vous plaît", [["请", "qǐng", "prier"]]],
+  ["Mots utiles", "对", "duì", "Oui", [["对", "duì", "juste"]]],
+  ["Mots utiles", "不", "bù", "Non", [["不", "bù", "ne pas"]]],
+  ["Mots utiles", "不好意思", "bù hǎoyìsi", "Excusez-moi", [["不", "bù", "ne pas"], ["好", "hǎo", "bon"], ["意", "yì", "idée"], ["思", "sī", "pensée"]]],
+  ["Nourriture", "水", "shuǐ", "Eau", [["水", "shuǐ", "eau"]]],
+  ["Nourriture", "面包", "miànbāo", "Pain", [["面", "miàn", "farine"], ["包", "bāo", "paquet"]]],
+  ["Nourriture", "牛奶", "niúnǎi", "Lait", [["牛", "niú", "vache"], ["奶", "nǎi", "lait"]]],
+  ["Nourriture", "苹果", "píngguǒ", "Pomme", [["苹", "píng", "pomme"], ["果", "guǒ", "fruit"]]],
+  ["Nourriture", "茶", "chá", "Thé", [["茶", "chá", "thé"]]],
+  ["Nourriture", "咖啡", "kāfēi", "Café", [["咖", "kā", "son ka"], ["啡", "fēi", "son fei"]]],
+  ["Chiffres", "一", "yī", "Un", [["一", "yī", "un"]]],
+  ["Chiffres", "二", "èr", "Deux", [["二", "èr", "deux"]]],
+  ["Chiffres", "三", "sān", "Trois", [["三", "sān", "trois"]]],
+  ["Chiffres", "十", "shí", "Dix", [["十", "shí", "dix"]]],
+].map(([category, front, phonetic, back, glyphs]) => ({
+  category,
+  front,
+  phonetic,
+  back,
+  speak: front,
+  glyphs: glyphs.map(([c, p, m]) => ({ c, p, m })),
+}));
 
 const chineseGrammar = [
   {
     title: "是",
     rule: "Pas d'article, peu de conjugaison. 是 veut dire « être », « c'est ».",
     examples: [
-      { say: "这是水", target: "这是水", gloss: "c'est de l'eau" },
-      { say: "我是学生", target: "我是学生", gloss: "je suis étudiant" },
+      { say: "这是水", target: "这是水", gloss: "c'est de l'eau", glyphs: [["这", "zhè", "ceci"], ["是", "shì", "être"], ["水", "shuǐ", "eau"]] },
+      { say: "我是学生", target: "我是学生", gloss: "je suis étudiant", glyphs: [["我", "wǒ", "je"], ["是", "shì", "être"], ["学", "xué", "étudier"], ["生", "shēng", "personne"]] },
     ],
   },
   {
     title: "吗",
     rule: "吗 à la fin pose une question oui ou non.",
     examples: [
-      { say: "你好吗", target: "你好吗", gloss: "comment ça va ?" },
-      { say: "这是水吗", target: "这是水吗", gloss: "c'est de l'eau ?" },
+      { say: "你好吗", target: "你好吗", gloss: "comment ça va ?", glyphs: [["你", "nǐ", "tu"], ["好", "hǎo", "bon"], ["吗", "ma", "est-ce que"]] },
+      { say: "这是水吗", target: "这是水吗", gloss: "c'est de l'eau ?", glyphs: [["这", "zhè", "ceci"], ["是", "shì", "être"], ["水", "shuǐ", "eau"], ["吗", "ma", "est-ce que"]] },
     ],
   },
   {
     title: "不",
     rule: "不 se place devant le verbe pour dire non.",
     examples: [
-      { say: "我不是", target: "我不是", gloss: "je ne suis pas" },
-      { say: "这不是面包", target: "这不是面包", gloss: "ce n'est pas du pain" },
+      { say: "我不是", target: "我不是", gloss: "je ne suis pas", glyphs: [["我", "wǒ", "je"], ["不", "bù", "ne pas"], ["是", "shì", "être"]] },
+      { say: "这不是面包", target: "这不是面包", gloss: "ce n'est pas du pain", glyphs: [["这", "zhè", "ceci"], ["不", "bù", "ne pas"], ["是", "shì", "être"], ["面", "miàn", "farine"], ["包", "bāo", "paquet"]] },
     ],
   },
 ];
@@ -513,51 +527,58 @@ const arabicAlphabet = [
 ];
 
 const arabicWords = [
-  ["Salutations", "مرحبا", "marhaban", "Bonjour"],
-  ["Salutations", "السلام عليكم", "salam alaykoum", "Bonjour (formel)"],
-  ["Salutations", "صباح الخير", "sabah al-khayr", "Bonjour (le matin)"],
-  ["Salutations", "مع السلامة", "ma'a s-salama", "Au revoir"],
-  ["Salutations", "كيف الحال", "kayfa al-hal", "Comment ça va ?"],
-  ["Mots utiles", "شكرا", "shoukran", "Merci"],
-  ["Mots utiles", "من فضلك", "min fadlik", "S'il vous plaît"],
-  ["Mots utiles", "نعم", "na'am", "Oui"],
-  ["Mots utiles", "لا", "la", "Non"],
-  ["Mots utiles", "عفوا", "afwan", "Excusez-moi"],
-  ["Nourriture", "ماء", "ma'", "Eau"],
-  ["Nourriture", "خبز", "khoubz", "Pain"],
-  ["Nourriture", "حليب", "halib", "Lait"],
-  ["Nourriture", "تفاحة", "touffaha", "Pomme"],
-  ["Nourriture", "شاي", "shay", "Thé"],
-  ["Nourriture", "قهوة", "qahwa", "Café"],
-  ["Chiffres", "واحد", "wahid", "Un"],
-  ["Chiffres", "اثنان", "ithnan", "Deux"],
-  ["Chiffres", "ثلاثة", "thalatha", "Trois"],
-  ["Chiffres", "عشرة", "ashara", "Dix"],
-].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+  ["Salutations", "مرحبا", "marhaban", "Bonjour", [["م", "m", "m"], ["ر", "r", "r"], ["ح", "h", "h"], ["ب", "b", "b"], ["ا", "a", "a"]]],
+  ["Salutations", "السلام عليكم", "salam alaykoum", "Bonjour (formel)", [["السلام", "as-salam", "la paix"], ["عليكم", "alaykoum", "sur vous"]]],
+  ["Salutations", "صباح الخير", "sabah al-khayr", "Bonjour (le matin)", [["صباح", "sabah", "matin"], ["الخير", "al-khayr", "le bien"]]],
+  ["Salutations", "مع السلامة", "ma'a s-salama", "Au revoir", [["مع", "ma'a", "avec"], ["السلامة", "as-salama", "la sécurité"]]],
+  ["Salutations", "كيف الحال", "kayfa al-hal", "Comment ça va ?", [["كيف", "kayfa", "comment"], ["الحال", "al-hal", "l'état"]]],
+  ["Mots utiles", "شكرا", "shoukran", "Merci", [["ش", "ch", "ch"], ["ك", "k", "k"], ["ر", "r", "r"], ["ا", "a", "a"]]],
+  ["Mots utiles", "من فضلك", "min fadlik", "S'il vous plaît", [["من", "min", "de"], ["فضلك", "fadlik", "ta faveur"]]],
+  ["Mots utiles", "نعم", "na'am", "Oui", [["ن", "n", "n"], ["ع", "ʿ", "ʿ"], ["م", "m", "m"]]],
+  ["Mots utiles", "لا", "la", "Non", [["ل", "l", "l"], ["ا", "a", "a"]]],
+  ["Mots utiles", "عفوا", "afwan", "Excusez-moi", [["ع", "ʿ", "ʿ"], ["ف", "f", "f"], ["و", "w", "ou"], ["ا", "a", "a"]]],
+  ["Nourriture", "ماء", "ma'", "Eau", [["م", "m", "m"], ["ا", "a", "a"], ["ء", "ʾ", "coup de glotte"]]],
+  ["Nourriture", "خبز", "khoubz", "Pain", [["خ", "kh", "kh"], ["ب", "b", "b"], ["ز", "z", "z"]]],
+  ["Nourriture", "حليب", "halib", "Lait", [["ح", "h", "h"], ["ل", "l", "l"], ["ي", "i", "i"], ["ب", "b", "b"]]],
+  ["Nourriture", "تفاحة", "touffaha", "Pomme", [["ت", "t", "t"], ["ف", "f", "f"], ["ا", "a", "a"], ["ح", "h", "h"], ["ة", "a", "a"]]],
+  ["Nourriture", "شاي", "shay", "Thé", [["ش", "ch", "ch"], ["ا", "a", "a"], ["ي", "i", "i"]]],
+  ["Nourriture", "قهوة", "qahwa", "Café", [["ق", "q", "q"], ["ه", "h", "h"], ["و", "w", "ou"], ["ة", "a", "a"]]],
+  ["Chiffres", "واحد", "wahid", "Un", [["و", "w", "ou"], ["ا", "a", "a"], ["ح", "h", "h"], ["د", "d", "d"]]],
+  ["Chiffres", "اثنان", "ithnan", "Deux", [["ا", "i", "i"], ["ث", "th", "th"], ["ن", "n", "n"], ["ا", "a", "a"], ["ن", "n", "n"]]],
+  ["Chiffres", "ثلاثة", "thalatha", "Trois", [["ث", "th", "th"], ["ل", "l", "l"], ["ا", "a", "a"], ["ث", "th", "th"], ["ة", "a", "a"]]],
+  ["Chiffres", "عشرة", "ashara", "Dix", [["ع", "ʿ", "ʿ"], ["ش", "ch", "ch"], ["ر", "r", "r"], ["ة", "a", "a"]]],
+].map(([category, front, phonetic, back, glyphs]) => ({
+  category,
+  front,
+  phonetic,
+  back,
+  speak: front,
+  glyphs: glyphs.map(([c, p, m]) => ({ c, p, m })),
+}));
 
 const arabicGrammar = [
   {
     title: "L'article ال",
     rule: "ال se colle devant le nom pour dire « le » ou « la ». الماء, c'est l'eau.",
     examples: [
-      { say: "الماء", target: "الماء", gloss: "l'eau" },
-      { say: "الخبز", target: "الخبز", gloss: "le pain" },
+      { say: "الماء", target: "الماء", gloss: "l'eau", glyphs: [["ال", "al", "le"], ["ماء", "mā'", "eau"]] },
+      { say: "الخبز", target: "الخبز", gloss: "le pain", glyphs: [["ال", "al", "le"], ["خبز", "khoubz", "pain"]] },
     ],
   },
   {
     title: "Pas de verbe être",
     rule: "Au présent, on ne dit pas « être ». أنا veut dire je. هذا ماء : ceci est de l'eau.",
     examples: [
-      { say: "أنا", target: "أنا", gloss: "je" },
-      { say: "هذا ماء", target: "هذا ماء", gloss: "ceci est de l'eau" },
+      { say: "أنا", target: "أنا", gloss: "je", glyphs: [["أ", "a", "a"], ["ن", "n", "n"], ["ا", "ā", "a long"]] },
+      { say: "هذا ماء", target: "هذا ماء", gloss: "ceci est de l'eau", glyphs: [["هذا", "hādhā", "ceci"], ["ماء", "mā'", "eau"]] },
     ],
   },
   {
     title: "هل",
     rule: "هل en tête de phrase pose une question oui ou non.",
     examples: [
-      { say: "هل هذا ماء", target: "هل هذا ماء؟", gloss: "est-ce de l'eau ?" },
-      { say: "هل أنت بخير", target: "هل أنت بخير؟", gloss: "est-ce que ça va ?" },
+      { say: "هل هذا ماء", target: "هل هذا ماء؟", gloss: "est-ce de l'eau ?", glyphs: [["هل", "hal", "est-ce que"], ["هذا", "hādhā", "ceci"], ["ماء", "mā'", "eau"]] },
+      { say: "هل أنت بخير", target: "هل أنت بخير؟", gloss: "est-ce que ça va ?", glyphs: [["هل", "hal", "est-ce que"], ["أنت", "anta", "tu"], ["بخير", "bi-khayr", "bien"]] },
     ],
   },
 ];
@@ -765,6 +786,14 @@ function speak(text) {
   speechSynthesis.speak(utterance);
 }
 
+function glyphRow(glyphs) {
+  if (!glyphs || !glyphs.length) return "";
+  return `<span class="glyphs">${glyphs.map((glyph) => {
+    const item = Array.isArray(glyph) ? { c: glyph[0], p: glyph[1], m: glyph[2] } : glyph;
+    return `<span class="glyph"><b ${scriptAttrs()}>${item.c}</b><i>${item.p}</i><small>${item.m}</small></span>`;
+  }).join("")}</span>`;
+}
+
 function scriptAttrs() {
   const dir = course.dir === "rtl" ? ' dir="rtl"' : "";
   return `lang="${course.voice.slice(0, 2)}"${dir}`;
@@ -906,6 +935,7 @@ function showAlphabet() {
       <p class="letter" ${scriptAttrs()}>${letter.upper} ${letter.lower}</p>
       <p class="hint">${letter.hint}</p>
       <p class="example">${letter.example} · ${letter.exampleBack}</p>
+      ${glyphRow(letter.glyphs)}
     </article>
   `;
   setActions([
@@ -924,7 +954,7 @@ function showGrammar() {
       <p class="mark">${item.title}</p>
       <p class="rule">${item.rule}</p>
       <div class="examples">
-        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong ${scriptAttrs()}>${example.target}</strong><span>${example.gloss}</span></button>`).join("")}
+        ${item.examples.map((example) => `<button type="button" class="example-btn" data-say="${example.say}"><strong ${scriptAttrs()}>${example.target}</strong><span>${example.gloss}</span>${glyphRow(example.glyphs)}</button>`).join("")}
       </div>
     </article>
   `;
@@ -947,6 +977,7 @@ function showVocab() {
           <span class="tag">${isNew ? course.labels.fresh : course.labels.review}</span>
           <span class="word" ${scriptAttrs()}>${word.front}</span>
           <span class="phonetic">${word.phonetic}</span>
+          ${glyphRow(word.glyphs)}
           <span class="face-label">${course.labels.front}</span>
         </span>
         <span class="face face-back">
@@ -976,6 +1007,7 @@ function showSpeak() {
       <p class="mark">${word.back}</p>
       <p class="word" ${scriptAttrs()}>${word.front}</p>
       <p class="phonetic">${word.phonetic}</p>
+      ${glyphRow(word.glyphs)}
     </article>
   `;
   const last = cursor === session.speaks.length - 1;
