@@ -383,11 +383,297 @@ const courses = {
   },
 };
 
-const soon = [
-  { title: "Japonais", note: "Bientôt" },
-  { title: "Chinois", note: "Bientôt" },
-  { title: "Arabe", note: "Bientôt" },
+const japaneseAlphabet = [
+  { upper: "あ", lower: "ア", name: "A", hint: "Comme le a de « papa ».", example: "あめ", exampleBack: "pluie", speak: "あ" },
+  { upper: "い", lower: "イ", name: "I", hint: "Comme le i de « lit ».", example: "いえ", exampleBack: "maison", speak: "い" },
+  { upper: "う", lower: "ウ", name: "Ou", hint: "Comme le ou de « loup ».", example: "うみ", exampleBack: "mer", speak: "う" },
+  { upper: "え", lower: "エ", name: "É", hint: "Comme le é de « été ».", example: "えき", exampleBack: "gare", speak: "え" },
+  { upper: "お", lower: "オ", name: "O", hint: "Comme le o de « or ».", example: "おちゃ", exampleBack: "thé", speak: "お" },
+  { upper: "か", lower: "カ", name: "Ka", hint: "K + a.", example: "かさ", exampleBack: "parapluie", speak: "か" },
+  { upper: "き", lower: "キ", name: "Ki", hint: "K + i.", example: "き", exampleBack: "arbre", speak: "き" },
+  { upper: "ん", lower: "ン", name: "N", hint: "Une consonne seule, en fin de syllabe.", example: "パン", exampleBack: "pain", speak: "パン" },
 ];
+
+const japaneseWords = [
+  ["Salutations", "こんにちは", "konnichiwa", "Bonjour"],
+  ["Salutations", "おはよう", "ohayou", "Bonjour (le matin)"],
+  ["Salutations", "さようなら", "sayounara", "Au revoir"],
+  ["Salutations", "元気ですか", "genki desu ka", "Comment ça va ?"],
+  ["Mots utiles", "ありがとう", "arigatou", "Merci"],
+  ["Mots utiles", "お願いします", "onegaishimasu", "S'il vous plaît"],
+  ["Mots utiles", "はい", "hai", "Oui"],
+  ["Mots utiles", "いいえ", "iie", "Non"],
+  ["Mots utiles", "すみません", "sumimasen", "Excusez-moi"],
+  ["Nourriture", "水", "mizu", "Eau"],
+  ["Nourriture", "パン", "pan", "Pain"],
+  ["Nourriture", "牛乳", "gyuunyuu", "Lait"],
+  ["Nourriture", "りんご", "ringo", "Pomme"],
+  ["Nourriture", "お茶", "ocha", "Thé"],
+  ["Nourriture", "コーヒー", "koohii", "Café"],
+  ["Chiffres", "一", "ichi", "Un"],
+  ["Chiffres", "二", "ni", "Deux"],
+  ["Chiffres", "三", "san", "Trois"],
+  ["Chiffres", "十", "juu", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const japaneseGrammar = [
+  {
+    title: "La particule は",
+    rule: "は marque le thème de la phrase. Dans ce rôle, on la lit « wa », pas « ha ».",
+    examples: [
+      { say: "みずは みずです", target: "水は水です", gloss: "l'eau, c'est de l'eau" },
+      { say: "これは パンです", target: "これはパンです", gloss: "ceci est du pain" },
+    ],
+  },
+  {
+    title: "です",
+    rule: "です ferme une phrase polie. Il veut souvent dire « c'est ».",
+    examples: [
+      { say: "これは みずです", target: "これは水です", gloss: "c'est de l'eau" },
+      { say: "りんごです", target: "りんごです", gloss: "c'est une pomme" },
+    ],
+  },
+  {
+    title: "La question か",
+    rule: "か à la fin transforme la phrase en question.",
+    examples: [
+      { say: "みずですか", target: "水ですか", gloss: "c'est de l'eau ?" },
+      { say: "げんきですか", target: "元気ですか", gloss: "comment ça va ?" },
+    ],
+  },
+];
+
+const chineseAlphabet = [
+  { upper: "mā", lower: "妈", name: "1er ton", hint: "La voix reste haute et plate.", example: "妈", exampleBack: "maman", speak: "妈" },
+  { upper: "má", lower: "麻", name: "2e ton", hint: "La voix monte, comme une question.", example: "麻", exampleBack: "chanvre", speak: "麻" },
+  { upper: "mǎ", lower: "马", name: "3e ton", hint: "La voix descend, puis remonte.", example: "马", exampleBack: "cheval", speak: "马" },
+  { upper: "mà", lower: "骂", name: "4e ton", hint: "La voix tombe, nette.", example: "骂", exampleBack: "gronder", speak: "骂" },
+  { upper: "zh", lower: "知", name: "Zh", hint: "La langue se relève, comme « dj ».", example: "知道", exampleBack: "savoir", speak: "知道" },
+  { upper: "x", lower: "西", name: "X", hint: "Un s très léger, la langue vers les dents.", example: "西", exampleBack: "ouest", speak: "西" },
+];
+
+const chineseWords = [
+  ["Salutations", "你好", "nǐ hǎo", "Bonjour"],
+  ["Salutations", "早上好", "zǎoshang hǎo", "Bonjour (le matin)"],
+  ["Salutations", "再见", "zàijiàn", "Au revoir"],
+  ["Salutations", "你好吗", "nǐ hǎo ma", "Comment ça va ?"],
+  ["Mots utiles", "谢谢", "xièxie", "Merci"],
+  ["Mots utiles", "请", "qǐng", "S'il vous plaît"],
+  ["Mots utiles", "对", "duì", "Oui"],
+  ["Mots utiles", "不", "bù", "Non"],
+  ["Mots utiles", "不好意思", "bù hǎoyìsi", "Excusez-moi"],
+  ["Nourriture", "水", "shuǐ", "Eau"],
+  ["Nourriture", "面包", "miànbāo", "Pain"],
+  ["Nourriture", "牛奶", "niúnǎi", "Lait"],
+  ["Nourriture", "苹果", "píngguǒ", "Pomme"],
+  ["Nourriture", "茶", "chá", "Thé"],
+  ["Nourriture", "咖啡", "kāfēi", "Café"],
+  ["Chiffres", "一", "yī", "Un"],
+  ["Chiffres", "二", "èr", "Deux"],
+  ["Chiffres", "三", "sān", "Trois"],
+  ["Chiffres", "十", "shí", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const chineseGrammar = [
+  {
+    title: "是",
+    rule: "Pas d'article, peu de conjugaison. 是 veut dire « être », « c'est ».",
+    examples: [
+      { say: "这是水", target: "这是水", gloss: "c'est de l'eau" },
+      { say: "我是学生", target: "我是学生", gloss: "je suis étudiant" },
+    ],
+  },
+  {
+    title: "吗",
+    rule: "吗 à la fin pose une question oui ou non.",
+    examples: [
+      { say: "你好吗", target: "你好吗", gloss: "comment ça va ?" },
+      { say: "这是水吗", target: "这是水吗", gloss: "c'est de l'eau ?" },
+    ],
+  },
+  {
+    title: "不",
+    rule: "不 se place devant le verbe pour dire non.",
+    examples: [
+      { say: "我不是", target: "我不是", gloss: "je ne suis pas" },
+      { say: "这不是面包", target: "这不是面包", gloss: "ce n'est pas du pain" },
+    ],
+  },
+];
+
+const arabicAlphabet = [
+  { upper: "ا", lower: "a", name: "Alif", hint: "Porte le a, ou allonge la voyelle.", example: "أب", exampleBack: "père", speak: "أب" },
+  { upper: "ب", lower: "b", name: "Ba", hint: "Comme le b de « beau ». Un point en dessous.", example: "باب", exampleBack: "porte", speak: "باب" },
+  { upper: "ت", lower: "t", name: "Ta", hint: "Comme le t. Deux points au-dessus.", example: "توت", exampleBack: "mûre", speak: "توت" },
+  { upper: "ج", lower: "j", name: "Jim", hint: "Comme le j de « jour ». Un point en dessous.", example: "جميل", exampleBack: "beau", speak: "جميل" },
+  { upper: "ح", lower: "h", hint: "Un h soufflé, du fond de la gorge.", name: "Ha", example: "حليب", exampleBack: "lait", speak: "حليب" },
+  { upper: "د", lower: "d", name: "Dal", hint: "Comme le d de « dos ».", example: "دار", exampleBack: "maison", speak: "دار" },
+  { upper: "ر", lower: "r", name: "Ra", hint: "Un r roulé.", example: "رز", exampleBack: "riz", speak: "رز" },
+  { upper: "م", lower: "m", name: "Mim", hint: "Comme le m de « mer ».", example: "ماء", exampleBack: "eau", speak: "ماء" },
+];
+
+const arabicWords = [
+  ["Salutations", "مرحبا", "marhaban", "Bonjour"],
+  ["Salutations", "السلام عليكم", "salam alaykoum", "Bonjour (formel)"],
+  ["Salutations", "صباح الخير", "sabah al-khayr", "Bonjour (le matin)"],
+  ["Salutations", "مع السلامة", "ma'a s-salama", "Au revoir"],
+  ["Salutations", "كيف الحال", "kayfa al-hal", "Comment ça va ?"],
+  ["Mots utiles", "شكرا", "shoukran", "Merci"],
+  ["Mots utiles", "من فضلك", "min fadlik", "S'il vous plaît"],
+  ["Mots utiles", "نعم", "na'am", "Oui"],
+  ["Mots utiles", "لا", "la", "Non"],
+  ["Mots utiles", "عفوا", "afwan", "Excusez-moi"],
+  ["Nourriture", "ماء", "ma'", "Eau"],
+  ["Nourriture", "خبز", "khoubz", "Pain"],
+  ["Nourriture", "حليب", "halib", "Lait"],
+  ["Nourriture", "تفاحة", "touffaha", "Pomme"],
+  ["Nourriture", "شاي", "shay", "Thé"],
+  ["Nourriture", "قهوة", "qahwa", "Café"],
+  ["Chiffres", "واحد", "wahid", "Un"],
+  ["Chiffres", "اثنان", "ithnan", "Deux"],
+  ["Chiffres", "ثلاثة", "thalatha", "Trois"],
+  ["Chiffres", "عشرة", "ashara", "Dix"],
+].map(([category, front, phonetic, back]) => ({ category, front, phonetic, back, speak: front }));
+
+const arabicGrammar = [
+  {
+    title: "L'article ال",
+    rule: "ال se colle devant le nom pour dire « le » ou « la ». الماء, c'est l'eau.",
+    examples: [
+      { say: "الماء", target: "الماء", gloss: "l'eau" },
+      { say: "الخبز", target: "الخبز", gloss: "le pain" },
+    ],
+  },
+  {
+    title: "Pas de verbe être",
+    rule: "Au présent, on ne dit pas « être ». أنا veut dire je. هذا ماء : ceci est de l'eau.",
+    examples: [
+      { say: "أنا", target: "أنا", gloss: "je" },
+      { say: "هذا ماء", target: "هذا ماء", gloss: "ceci est de l'eau" },
+    ],
+  },
+  {
+    title: "هل",
+    rule: "هل en tête de phrase pose une question oui ou non.",
+    examples: [
+      { say: "هل هذا ماء", target: "هل هذا ماء؟", gloss: "est-ce de l'eau ?" },
+      { say: "هل أنت بخير", target: "هل أنت بخير؟", gloss: "est-ce que ça va ?" },
+    ],
+  },
+];
+
+function courseInFrench(front) {
+  return {
+    front,
+    back: "Français",
+    start: "Commencer",
+    backHome: "Les langues",
+    listen: "Écouter",
+    flip: "Retourner",
+    nextLetter: "Son suivant",
+    toGrammar: "La grammaire",
+    grammarStep: "Grammaire",
+    toWords: "Vers les mots",
+    again: "À revoir",
+    know: "Je le sais",
+    toSpeak: "Vers la prononciation",
+    repeated: "J’ai répété",
+    finish: "Terminer",
+    doneHome: "Les langues",
+    review: "Révision",
+    fresh: "Nouveau",
+    session: "Séance du jour",
+    already: "Séance déjà faite aujourd’hui",
+    finished: "Séance terminée",
+    againTitle: "On peut recommencer",
+    ready: "Cinq minutes",
+    lobbyBody: "D’abord ce qui s’efface, ensuite un peu de nouveau.",
+    doneTitle: "À demain",
+    held: (time) => `Vous avez tenu ${time}. Je vous redonnerai ces mots.`,
+    streak: (n) => `${n} jour${n > 1 ? "s" : ""} d’affilée`,
+    letterStep: (i, n) => `Son · ${i} sur ${n}`,
+    wordStep: (i, n) => `Mots · ${i} sur ${n}`,
+    speakStep: (i, n) => `Prononciation · ${i} sur ${n}`,
+    plan: (reviews, fresh) => `${reviews} à revoir · ${fresh} nouveau${fresh > 1 ? "x" : ""}`,
+    install: "iPhone : Partager, puis Sur l’écran d’accueil. Android : menu du navigateur, puis Installer l’application.",
+    noVoice: "La voix n’est pas disponible ici. Suivez l’écriture.",
+  };
+}
+
+Object.assign(courses, {
+  "fr-ja": {
+    id: "fr-ja",
+    ui: "fr",
+    voice: "ja-JP",
+    title: "Japonais",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Un son, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "Écoutez ce son, puis répétez-le tout bas.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: japaneseAlphabet,
+    words: japaneseWords,
+    grammar: japaneseGrammar,
+    teachers: [
+      { id: "hana", name: "Hana Mori", role: "Professeure de japonais", portrait: "hana.jpg", hello: "Je m’appelle Hana Mori. Un son, une règle, puis des mots." },
+      { id: "haruto", name: "Haruto Sato", role: "Professeur de japonais", portrait: "haruto.jpg", hello: "Je m’appelle Haruto Sato. Un son, une règle, puis des mots." },
+    ],
+    labels: courseInFrench("Japonais"),
+  },
+  "fr-zh": {
+    id: "fr-zh",
+    ui: "fr",
+    voice: "zh-CN",
+    title: "Chinois",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Un ton, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "Écoutez ce ton, puis répétez-le tout bas.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: chineseAlphabet,
+    words: chineseWords,
+    grammar: chineseGrammar,
+    teachers: [
+      { id: "mei", name: "Mei Lin", role: "Professeure de chinois", portrait: "mei.jpg", hello: "Je m’appelle Mei Lin. Un ton, une règle, puis des mots." },
+      { id: "chen", name: "Wei Chen", role: "Professeur de chinois", portrait: "chen.jpg", hello: "Je m’appelle Wei Chen. Un ton, une règle, puis des mots." },
+    ],
+    labels: courseInFrench("Chinois"),
+  },
+  "fr-ar": {
+    id: "fr-ar",
+    ui: "fr",
+    voice: "ar",
+    dir: "rtl",
+    title: "Arabe",
+    forWhom: "Si vous parlez français",
+    lines: {
+      lobby: "Une lettre, une règle, puis les mots qui reviennent.",
+      grammar: "Voici la règle du jour. Écoutez les deux exemples.",
+      alphabet: "L’arabe se lit de droite à gauche. Écoutez la lettre.",
+      vocab: "Si le mot vous échappe, dites « À revoir ». Il reviendra.",
+      speak: "Je le dis. Vous le reprenez.",
+      done: "Assez pour aujourd’hui. Demain, ces mots reviennent.",
+    },
+    alphabet: arabicAlphabet,
+    words: arabicWords,
+    grammar: arabicGrammar,
+    teachers: [
+      { id: "layla", name: "Layla Haddad", role: "Professeure d’arabe", portrait: "layla.jpg", hello: "Je m’appelle Layla Haddad. Une lettre, une règle, puis des mots." },
+      { id: "karim", name: "Karim Nassar", role: "Professeur d’arabe", portrait: "karim.jpg", hello: "Je m’appelle Karim Nassar. Une lettre, une règle, puis des mots." },
+    ],
+    labels: courseInFrench("Arabe"),
+  },
+});
+
+const soon = [];
 
 const stage = document.getElementById("stage");
 const actions = document.getElementById("actions");
@@ -576,7 +862,7 @@ function showPick() {
   stage.innerHTML = `
     <article class="panel">
       <h2>Choisissez qui vous guide</h2>
-      <p>Une fille ou un garçon, pour cinq minutes. Le russe, le français, le breton. Les mots reviennent les jours suivants.</p>
+      <p>Une fille ou un garçon, pour cinq minutes. Russe, français, breton, japonais, chinois et arabe. Les mots reviennent les jours suivants.</p>
     </article>
     <div class="courses">${blocks}${later}</div>
   `;
