@@ -91,6 +91,13 @@ function shuffle(list, random) {
 
 export function gradeCard(previous, { knew, introducedToday, today }) {
   const prior = normalizeCard(previous);
+  if (knew && prior && prior.next_review_date && !isDue(prior.next_review_date, today)) {
+    return {
+      box_level: prior.box_level,
+      next_review_date: prior.next_review_date,
+      touched: today,
+    };
+  }
   let level;
   if (!knew || introducedToday || !prior) level = 1;
   else level = Math.min(4, prior.box_level + 1);
@@ -197,19 +204,23 @@ export function nextMilestone(progress) {
   return (Math.floor(done / MILESTONE_EVERY) + 1) * MILESTONE_EVERY;
 }
 
-export function buildCheckpoint({ wordCount, seenIds, seed, count = CHECKPOINT_SIZE }) {
+export function buildCheckpoint({ wordCount, seenIds, seed, count = CHECKPOINT_SIZE, cards = {} }) {
   const pool = seenIds && seenIds.length >= 4
     ? seenIds.slice()
     : Array.from({ length: wordCount }, (_, index) => index);
   const random = mulberry32(hashString(seed));
   const quiz = shuffle(pool, random).slice(0, Math.min(count, pool.length));
+  const startLevels = {};
+  for (const id of quiz) {
+    startLevels[id] = normalizeCard(cards?.[id] ?? cards?.[String(id)])?.box_level || 0;
+  }
   return {
     version: 2,
     checkpoint: true,
     warmup: [],
     fresh: [],
     quiz,
-    startLevels: {},
+    startLevels,
     doneCount: 0,
     phase: "quiz",
     cursor: 0,

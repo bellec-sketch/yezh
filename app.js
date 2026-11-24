@@ -843,6 +843,7 @@ function previewSession(progress) {
     return buildCheckpoint({
       wordCount: course.words.length,
       seenIds: seenWordIds(progress),
+      cards: progress.cards,
       seed: `${course.id}:${todayKey()}:check`,
     });
   }
@@ -872,11 +873,20 @@ function persistSession() {
   saveProgress(progress);
 }
 
-function commitGrade(index, knew) {
+function commitGrade(index, knew, fromQuiz = false) {
   const progress = loadProgress(course.id);
-  progress.cards[index] = gradeCard(progress.cards[index], {
+  const introduced = (session.fresh || []).includes(index);
+  let prior = progress.cards[index];
+  if (fromQuiz) {
+    const existing = progress.cards[index];
+    const level = session.startLevels?.[index] || existing?.box_level || 0;
+    prior = level
+      ? { box_level: level, next_review_date: existing?.next_review_date || todayKey(), touched: "" }
+      : null;
+  }
+  progress.cards[index] = gradeCard(prior, {
     knew,
-    introducedToday: session.fresh.includes(index),
+    introducedToday: introduced,
     today: todayKey(),
   });
   progress.savedDay = todayKey();
@@ -898,19 +908,26 @@ function setGauge() {
   if (course) gauge.setAttribute("aria-label", course.labels.ready);
 }
 
+let currentUtterance = null;
+
 function speak(text) {
-  const labels = course.labels;
-  if (!("speechSynthesis" in window) || !text) {
-    if (!("speechSynthesis" in window)) lineEl.textContent = labels.noVoice;
-    return;
-  }
+  if (!("speechSynthesis" in window) || !text) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = course.voice;
   utterance.rate = 0.82;
   const voice = speechSynthesis.getVoices().find((item) => item.lang.toLowerCase().startsWith(course.voice.slice(0, 2)));
   if (voice) utterance.voice = voice;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utterance);
+  currentUtterance = utterance;
+  const say = () => {
+    speechSynthesis.resume();
+    speechSynthesis.speak(utterance);
+  };
+  if (speechSynthesis.speaking || speechSynthesis.pending) {
+    speechSynthesis.cancel();
+    setTimeout(say, 80);
+    return;
+  }
+  say();
 }
 
 function glyphRow(glyphs) {
@@ -982,6 +999,50 @@ function dayGrammar() {
   return course.grammar[Math.floor(Date.now() / 86400000) % course.grammar.length];
 }
 
+function readLast() {
+  try {
+    return JSON.parse(localStorage.getItem("yezh-last")) || null;
+  } catch {
+    return null;
+  }
+}
+
+function rememberLast() {
+  localStorage.setItem("yezh-last", JSON.stringify({ courseId: course.id, teacherId: teacher.id }));
+}
+
+function resumeLine(item, person) {
+  const first = person.name.split(" ")[0];
+  if (item.ui === "ru") return `Продолжить ${item.title.toLowerCase()} с ${first}`;
+  return `Reprendre mon ${item.title.toLowerCase()} avec ${first}`;
+}
+
+function summaryLine(worked, again, ui) {
+  if (ui === "ru") return `${worked} слов за занятие, ${again} на завтра.`;
+  const words = worked > 1 ? "mots travaillés" : "mot travaillé";
+  return `${worked} ${words}, ${again} à revoir demain.`;
+}
+
+function countTomorrow(progress) {
+  const tomorrow = todayKey();
+  const ids = new Set([...(session.warmup || []), ...(session.fresh || []), ...(session.quiz || [])]);
+  let again = 0;
+  const due = addDaysKey(tomorrow);
+  ids.forEach((id) => {
+    const card = progress.cards[id];
+    if (card && card.next_review_date === due) again += 1;
+  });
+  return { worked: ids.size, again };
+}
+
+function addDaysKey(today) {
+  const [year, month, day] = today.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + 1);
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
+  return `${date.getUTCFullYear()}-${m}-${d}`;
+}
 function showPick() {
   course = null;
   teacher = null;
@@ -1007,12 +1068,28 @@ function showPick() {
       </div>
     </article>
   `).join("");
+  const last = readLast();
+  const lastCourse = last && courses[last.courseId];
+  const lastTeacher = lastCourse && lastCourse.teachers.find((person) => person.id === last.teacherId);
+  const resume = lastCourse && lastTeacher ? `
+    <button class="btn btn-primary wide resume" type="button" data-course="${lastCourse.id}" data-teacher="${lastTeacher.id}">
+      <img src="${lastTeacher.portrait}" alt="">
+      <span>${resumeLine(lastCourse, lastTeacher)}</span>
+    </button>
+    <button class="btn btn-ghost wide" type="button" data-show-langs>Les autres langues</button>
+  ` : "";
   stage.innerHTML = `
     <article class="panel">
-      <h2>Choisissez qui vous guide</h2>
-      <p>Une fille ou un garçon, pour cinq minutes. Neuf cartes : révision, mots nouveaux, quiz. Toutes les sept séances, un contrôle, puis une carte du guide.</p>
+      <h2>${resume ? "Bon retour" : "Choisissez qui vous guide"}</h2>
+      <p>${resume ? "La séance d’hier vous attend. Les autres langues restent là." : "Une fille ou un garçon, pour cinq minutes. Neuf cartes : révision, mots nouveaux, quiz. Toutes les sept séances, un contrôle, puis une carte du guide."}</p>
+      ${resume}
     </article>
-    <div class="courses">${blocks}</div>
+    <div class="courses" id="all-langs" ${resume ? "hidden" : ""}>${blocks}</div>
+    <p class="install">
+      <button type="button" data-export>Emporter ma progression</button>
+      <button type="button" data-import>Reprendre une sauvegarde</button>
+    </p>
+    <input id="import-file" type="file" accept="application/json" hidden>
   `;
   setActions([]);
   setGauge();
@@ -1203,11 +1280,13 @@ function showDone() {
   showTeacher(speech.close);
   stepEl.textContent = course.labels.finished;
   const jokerLine = joker ? `<p class="hint">${course.labels.jokerNote}</p>` : "";
+  const report = countTomorrow(progress);
   stage.innerHTML = `
     <article class="panel">
       <p class="streak">${course.labels.streak(progress.streak)}</p>
       <h2>${course.labels.doneTitle}</h2>
-      <p>${course.labels.held(formatClock(finishedSeconds || 0))}</p>
+      <p>${summaryLine(report.worked, report.again, course.ui)}</p>
+      <p class="hint">${course.labels.held(formatClock(finishedSeconds || 0))}</p>
       ${jokerLine}
     </article>
   `;
@@ -1271,7 +1350,7 @@ function advancePhase() {
 function answerCard(knew) {
   const list = session[session.phase];
   const index = list[session.cursor];
-  commitGrade(index, knew);
+  if (!(session.quiz || []).includes(index)) commitGrade(index, knew);
   session.doneCount += 1;
   if (session.cursor < list.length - 1) {
     session.cursor += 1;
@@ -1283,7 +1362,7 @@ function answerCard(knew) {
 }
 
 function finishQuizCard() {
-  commitGrade(session.pendingGrade.index, session.pendingGrade.knew);
+  commitGrade(session.pendingGrade.index, session.pendingGrade.knew, true);
   session.quizAwait = false;
   session.doneCount += 1;
   if (session.cursor < session.quiz.length - 1) {
@@ -1388,14 +1467,71 @@ stage.addEventListener("click", (event) => {
     speak(said.dataset.say);
     return;
   }
+  if (event.target.closest("[data-show-langs]")) {
+    const list = document.getElementById("all-langs");
+    if (list) list.hidden = false;
+    return;
+  }
+  if (event.target.closest("[data-export]")) {
+    exportProgress();
+    return;
+  }
+  if (event.target.closest("[data-import]")) {
+    document.getElementById("import-file")?.click();
+    return;
+  }
   const choice = event.target.closest("[data-teacher]");
   if (choice) {
     course = courses[choice.dataset.course];
     teacher = course.teachers.find((person) => person.id === choice.dataset.teacher);
+    rememberLast();
     showLobby();
     return;
   }
   if (event.target.closest("#card")) flipCard();
+});
+
+function exportProgress() {
+  const dump = {};
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key && key.startsWith("yezh-")) dump[key] = localStorage.getItem(key);
+  }
+  const file = new Blob([JSON.stringify(dump)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(file);
+  link.download = "yezh-progression.json";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function importProgress(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dump = JSON.parse(String(reader.result));
+    Object.entries(dump).forEach(([key, value]) => {
+      if (key.startsWith("yezh-") && typeof value === "string") localStorage.setItem(key, value);
+    });
+    showPick();
+  };
+  reader.readAsText(file);
+}
+
+document.addEventListener("change", (event) => {
+  const input = event.target;
+  if (input.id !== "import-file" || !input.files?.[0]) return;
+  importProgress(input.files[0]);
+  input.value = "";
+});
+
+document.addEventListener("pointerdown", () => {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.getVoices();
+  speechSynthesis.resume();
+}, { once: true });
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && window.speechSynthesis) speechSynthesis.resume();
 });
 
 if ("serviceWorker" in navigator) {

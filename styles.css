@@ -97,6 +97,33 @@ button, input { font: inherit; }
   border-radius: 13px;
 }
 
+.resume {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  text-align: left;
+}
+
+.resume img {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.install button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--blue);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .brand {
   margin: 0;
   font-size: 1.7rem;
@@ -181,6 +208,7 @@ button, input { font: inherit; }
 }
 
 .courses { display: flex; flex-direction: column; gap: 10px; }
+.courses[hidden] { display: none; }
 
 .course {
   display: grid;

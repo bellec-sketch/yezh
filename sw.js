@@ -1,4 +1,4 @@
-const CACHE = "yezh-v9";
+const CACHE = "yezh-v10";
 const FILES = [
   "./",
   "./index.html",

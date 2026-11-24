@@ -82,6 +82,22 @@ test("a checkpoint falls on every seventh lesson and reviews words already seen"
   assert.ok(session.quiz.every((id) => id <= 6));
 });
 
+test("a correct review before the due date keeps that date", () => {
+  const later = addDays(today, 21);
+  const kept = gradeCard(
+    { box_level: 4, next_review_date: later, touched: "" },
+    { knew: true, introducedToday: false, today },
+  );
+  assert.equal(kept.box_level, 4);
+  assert.equal(kept.next_review_date, later);
+  const missed = gradeCard(
+    { box_level: 4, next_review_date: later, touched: "" },
+    { knew: false, introducedToday: false, today },
+  );
+  assert.equal(missed.box_level, 1);
+  assert.equal(missed.next_review_date, "2026-11-25");
+});
+
 test("quiz choices include the right word once", () => {
   const choices = quizChoices(12, 4, "fr-ar:2026-11-24");
   assert.equal(choices.length, 3);
