@@ -84,6 +84,19 @@ button, input { font: inherit; }
   gap: 12px;
 }
 
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mark {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 13px;
+}
+
 .brand {
   margin: 0;
   font-size: 1.7rem;

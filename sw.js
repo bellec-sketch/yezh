@@ -1,4 +1,4 @@
-const CACHE = "yezh-v8";
+const CACHE = "yezh-v9";
 const FILES = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const FILES = [
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",
+  "./logo.svg",
   "./nina.jpg",
   "./pavel.jpg",
   "./sophie.jpg",
